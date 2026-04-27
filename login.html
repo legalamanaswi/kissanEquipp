@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login – KissanEquipp</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+    :root{
+      --forest:#1B4332;--mid:#2D6A4F;--leaf:#52B788;--mint:#95D5B2;
+      --pale:#D8F3DC;--cream:#F8FBF6;--gold:#D4A017;
+      --text:#1A2E1A;--muted:#5A7A5A;--white:#FFFFFF;
+    }
+    html{scroll-behavior:smooth;}
+    body{font-family:'DM Sans',sans-serif;background:var(--forest);color:var(--text);min-height:100vh;overflow-x:hidden;}
+    body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(circle,rgba(82,183,136,0.07) 1px,transparent 1px);background-size:26px 26px;pointer-events:none;z-index:0;}
+
+    nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 6%;height:66px;background:rgba(27,67,50,0.97);backdrop-filter:blur(14px);border-bottom:1px solid rgba(82,183,136,0.18);}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none;}
+    .logo-icon{width:36px;height:36px;background:var(--leaf);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:19px;}
+    .logo-text{font-family:'Playfair Display',serif;font-size:1.3rem;color:var(--white);}
+    .logo-text span{color:var(--gold);}
+    .nav-back{color:rgba(255,255,255,0.65);font-size:0.85rem;text-decoration:none;display:flex;align-items:center;gap:6px;transition:color 0.2s;}
+    .nav-back:hover{color:var(--mint);}
+
+    .page-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:90px 20px 40px;position:relative;z-index:1;}
+
+    .card{background:rgba(255,255,255,0.04);border:1.5px solid rgba(82,183,136,0.2);border-radius:24px;padding:42px 44px;width:100%;max-width:440px;backdrop-filter:blur(20px);animation:fadeUp 0.55s ease both;}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(24px);}to{opacity:1;transform:translateY(0);}}
+
+    .card-header{text-align:center;margin-bottom:28px;}
+    .card-title{font-family:'Playfair Display',serif;font-size:1.85rem;color:var(--white);margin-bottom:6px;}
+    .card-sub{font-size:0.84rem;color:rgba(255,255,255,0.48);}
+
+    .role-toggle{display:flex;background:rgba(0,0,0,0.25);border-radius:12px;padding:5px;margin-bottom:28px;gap:4px;}
+    .role-tab{flex:1;padding:11px 16px;border-radius:9px;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:0.88rem;font-weight:700;transition:all 0.25s;display:flex;align-items:center;justify-content:center;gap:7px;color:rgba(255,255,255,0.45);background:transparent;}
+    .role-tab.active-farmer{background:var(--leaf);color:var(--forest);}
+    .role-tab.active-owner{background:var(--gold);color:var(--forest);}
+    .role-tab:hover:not(.active-farmer):not(.active-owner){color:rgba(255,255,255,0.75);background:rgba(255,255,255,0.06);}
+
+    .form-group{margin-bottom:18px;}
+    label{display:block;font-size:0.76rem;font-weight:700;color:rgba(255,255,255,0.55);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:6px;}
+    input{width:100%;padding:12px 16px;background:rgba(255,255,255,0.06);border:1.5px solid rgba(82,183,136,0.2);border-radius:10px;color:var(--white);font-family:'DM Sans',sans-serif;font-size:0.9rem;outline:none;transition:all 0.2s;}
+    input::placeholder{color:rgba(255,255,255,0.25);}
+    input:focus{border-color:var(--leaf);background:rgba(82,183,136,0.08);}
+    .owner-mode input:focus{border-color:var(--gold);background:rgba(212,160,23,0.08);}
+
+    .pass-wrap{position:relative;}
+    .pass-toggle{position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:rgba(255,255,255,0.35);font-size:0.88rem;padding:0;transition:color 0.2s;}
+    .pass-toggle:hover{color:rgba(255,255,255,0.7);}
+
+    .forgot{display:block;text-align:right;font-size:0.78rem;color:rgba(255,255,255,0.35);text-decoration:none;margin-top:-10px;margin-bottom:18px;transition:color 0.2s;}
+    .forgot:hover{color:var(--mint);}
+    .owner-mode .forgot:hover{color:var(--gold);}
+
+    .btn-submit{width:100%;padding:14px;border:none;border-radius:11px;font-family:'DM Sans',sans-serif;font-size:0.97rem;font-weight:700;cursor:pointer;transition:all 0.25s;margin-top:4px;}
+    .btn-farmer{background:var(--leaf);color:var(--forest);}
+    .btn-farmer:hover{background:var(--mint);transform:translateY(-2px);box-shadow:0 10px 28px rgba(82,183,136,0.3);}
+    .btn-owner{background:var(--gold);color:var(--forest);}
+    .btn-owner:hover{background:#e8b520;transform:translateY(-2px);box-shadow:0 10px 28px rgba(212,160,23,0.3);}
+
+    .role-badge{display:inline-flex;align-items:center;gap:6px;font-size:0.75rem;font-weight:700;padding:4px 12px;border-radius:100px;margin-bottom:16px;}
+    .rb-farmer{background:rgba(82,183,136,0.15);color:var(--leaf);}
+    .rb-owner{background:rgba(212,160,23,0.15);color:var(--gold);}
+
+    .register-link{text-align:center;margin-top:20px;font-size:0.84rem;color:rgba(255,255,255,0.42);}
+    .register-link a{color:var(--leaf);text-decoration:none;font-weight:600;}
+    .register-link a:hover{color:var(--mint);}
+    .owner-mode .register-link a{color:var(--gold);}
+
+    .badge-row{display:flex;gap:8px;margin-top:26px;justify-content:center;flex-wrap:wrap;}
+    .badge{display:flex;align-items:center;gap:5px;font-size:0.71rem;color:rgba(255,255,255,0.35);background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:100px;padding:5px 12px;}
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="/index" class="logo">
+    <div class="logo-icon">🌾</div>
+    <div class="logo-text">Kissan<span>Equipp</span></div>
+  </a>
+  <a href="{{ url_for('home') }}" class="nav-back">← Back to Home</a>
+</nav>
+
+<div class="page-wrap">
+  <div class="card" id="mainCard">
+
+    <div class="card-header">
+      <div class="card-title">Welcome Back</div>
+      <div class="card-sub">Sign in to your KissanEquipp account</div>
+    </div>
+
+    <!-- ROLE TOGGLE -->
+    <div class="role-toggle">
+      <button class="role-tab" id="tab-farmer" onclick="switchRole('farmer')">👨‍🌾 Farmer</button>
+      <button class="role-tab" id="tab-owner" onclick="switchRole('owner')">🚜 Equipment Owner</button>
+    </div>
+
+    <!-- FARMER LOGIN -->
+    <div id="section-farmer">
+      <form method="POST" action="/login">
+      <input type="hidden" name="role" value="farmer">
+      <div class="role-badge rb-farmer">👨‍🌾 Farmer Login</div>
+      <div class="form-group">
+        <label>Mobile Number</label>
+        <input type="tel" name="mobile" placeholder="Enter mobile number">
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <div class="pass-wrap">
+          <input type="password"name="password" id="fp" placeholder="Enter your password"required/>
+          <button class="pass-toggle" onclick="togglePwd('fp',this)">👁</button>
+        </div>
+      </div>
+      <a href="#" class="forgot">Forgot password?</a>
+      <button type="submit" class="btn-submit btn-farmer">Sign In as Farmer →</button>
+      </form>
+    </div>
+
+    <!-- OWNER LOGIN -->
+    <div id="section-owner" style="display:none;">
+      <form method="POST" action="/login">
+      <input type="hidden" name="role" value="owner">
+      <div class="role-badge rb-owner">🚜 Owner Login</div>
+      <div class="form-group">
+        <label>Mobile Number</label>
+        <input type="tel" name="mobile" placeholder="Enter mobile number">
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <div class="pass-wrap">
+          <input type="password" name="password" id="op" placeholder="Enter your password"/>
+          <button class="pass-toggle" onclick="togglePwd('op',this)">👁</button>
+        </div>
+      </div>
+      <a href="#" class="forgot">Forgot password?</a>
+      <button type="submit" class="btn-submit btn-owner">Sign In as Owner →</button>
+    </div>
+
+    <div class="register-link">
+      Don't have an account?
+      <a href="{{ url_for('register') }}">Register here</a>
+    </div>
+
+    <div class="badge-row">
+      <div class="badge">🔒 Secure Login</div>
+      <div class="badge">✓ No Middlemen</div>
+      <div class="badge">🌾 18,000+ Farmers</div>
+    </div>
+  </div>
+</form>
+</div>
+
+<script>
+  function switchRole(role) {
+    const card = document.getElementById('mainCard');
+    document.getElementById('section-farmer').style.display = role === 'farmer' ? 'block' : 'none';
+    document.getElementById('section-owner').style.display = role === 'owner' ? 'block' : 'none';
+    document.querySelectorAll('.role-tab').forEach(t => t.classList.remove('active-farmer','active-owner'));
+    document.getElementById('tab-' + role).classList.add(role === 'farmer' ? 'active-farmer' : 'active-owner');
+    card.classList.toggle('owner-mode', role === 'owner');
+    // Update register link with role hint
+    document.getElementById('reg-link').href = '/register.?role=' + role;
+  }
+
+  function togglePwd(id, btn) {
+    const inp = document.getElementById(id);
+    if (inp.type === 'password') { inp.type = 'text'; btn.textContent = '🙈'; }
+    else { inp.type = 'password'; btn.textContent = '👁'; }
+  }
+
+  
+
+  window.addEventListener('DOMContentLoaded', () => {
+    const params = new URLSearchParams(window.location.search);
+    switchRole(params.get('role') === 'owner' ? 'owner' : 'farmer');
+  });
+</script>
+</body>
+</html>
