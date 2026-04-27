@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>KissanEquipp – Farmer Equipment Sharing & Booking</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+    :root{
+      --forest:#1B4332; --mid:#2D6A4F; --leaf:#52B788; --mint:#95D5B2;
+      --pale:#D8F3DC;   --cream:#F8FBF6; --gold:#D4A017;
+      --text:#1A2E1A;   --muted:#5A7A5A; --white:#FFFFFF;
+    }
+    html{scroll-behavior:smooth;}
+    body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--text);overflow-x:hidden;}
+    ::-webkit-scrollbar{width:6px;}
+    ::-webkit-scrollbar-track{background:var(--pale);}
+    ::-webkit-scrollbar-thumb{background:var(--leaf);border-radius:3px;}
+
+    /* NAV */
+    nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 6%;height:66px;background:rgba(27,67,50,0.97);backdrop-filter:blur(14px);border-bottom:1px solid rgba(82,183,136,0.18);}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none;}
+    .logo-icon{width:36px;height:36px;background:var(--leaf);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:19px;}
+    .logo-text{font-family:'Playfair Display',serif;font-size:1.3rem;color:var(--white);}
+    .logo-text span{color:var(--gold);}
+    nav ul{list-style:none;display:flex;gap:2rem;}
+    nav ul a{text-decoration:none;color:rgba(255,255,255,0.75);font-size:0.87rem;font-weight:500;transition:color 0.2s;}
+    nav ul a:hover{color:var(--mint);}
+    .nav-btns{display:flex;gap:10px;}
+    .btn-login{padding:7px 20px;border:1.5px solid var(--leaf);border-radius:7px;color:var(--leaf);font-size:0.84rem;font-weight:600;cursor:pointer;background:transparent;transition:all 0.25s;font-family:'DM Sans',sans-serif;}
+    .btn-login:hover{background:var(--leaf);color:var(--forest);}
+    .btn-register{padding:7px 20px;border:none;border-radius:7px;background:var(--gold);color:var(--forest);font-size:0.84rem;font-weight:700;cursor:pointer;transition:all 0.25s;font-family:'DM Sans',sans-serif;}
+    .btn-register:hover{background:#e8b520;transform:translateY(-1px);}
+
+    /* HERO */
+    .who{background:var(--forest);position:relative;overflow:hidden;}
+    .who::before{content:'';position:absolute;inset:0;background-image:radial-gradient(circle,rgba(82,183,136,0.08) 1px,transparent 1px);background-size:26px 26px;pointer-events:none;}
+    .who-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;position:relative;z-index:1;}
+    .who-card{background:rgba(255,255,255,0.05);border-radius:20px;padding:36px;border:1.5px solid rgba(82,183,136,0.2);transition:all 0.3s;}
+    .who-card:hover{background:rgba(255,255,255,0.08);transform:translateY(-4px);}
+    .who-card.owner-card{border-color:rgba(212,160,23,0.25);}
+    .who-card.owner-card:hover{border-color:rgba(212,160,23,0.5);}
+    .who-header{display:flex;align-items:center;gap:14px;margin-bottom:22px;}
+    .who-icon{width:56px;height:56px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:26px;}
+    .who-icon-green{background:rgba(82,183,136,0.2);}
+    .who-icon-gold{background:rgba(212,160,23,0.2);}
+    .who-name{font-family:'Playfair Display',serif;font-size:1.45rem;color:var(--white);}
+    .who-sub{font-size:0.79rem;color:rgba(255,255,255,0.48);margin-top:3px;}
+    .who-benefits{list-style:none;display:flex;flex-direction:column;gap:11px;margin-bottom:26px;}
+    .who-benefits li{display:flex;align-items:flex-start;gap:10px;font-size:0.87rem;color:rgba(255,255,255,0.72);line-height:1.5;}
+    .bdot{width:20px;height:20px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;margin-top:1px;}
+    .bdot-green{background:rgba(82,183,136,0.2);color:var(--leaf);}
+    .bdot-gold{background:rgba(212,160,23,0.2);color:var(--gold);}
+    .who-cta{display:inline-block;padding:11px 26px;border-radius:9px;font-size:0.87rem;font-weight:700;text-decoration:none;transition:all 0.2s;font-family:'DM Sans',sans-serif;}
+    .cta-green{background:var(--leaf);color:var(--forest);}
+    .cta-green:hover{background:var(--mint);}
+    .cta-gold{background:var(--gold);color:var(--forest);}
+    .cta-gold:hover{background:#e8b520;}
+
+    /* ROLE CARDS */
+    .role-cards{display:flex;gap:20px;justify-content:center;flex-wrap:wrap;position:relative;z-index:2;padding-bottom:70px;animation:fadeUp 1s 0.15s ease both;opacity:0;animation-fill-mode:forwards;}
+    .role-card{background:rgba(255,255,255,0.06);border:1.5px solid rgba(82,183,136,0.28);border-radius:20px;padding:32px 36px;width:270px;text-align:center;cursor:pointer;transition:all 0.3s;backdrop-filter:blur(8px);text-decoration:none;}
+    .role-card:hover{background:rgba(255,255,255,0.1);border-color:var(--leaf);transform:translateY(-7px);box-shadow:0 24px 60px rgba(0,0,0,0.3);}
+    .role-card.gold-card{border-color:rgba(212,160,23,0.32);}
+    .role-card.gold-card:hover{border-color:var(--gold);box-shadow:0 24px 60px rgba(212,160,23,0.2);}
+    .role-icon{font-size:3.2rem;margin-bottom:14px;display:block;}
+    .role-title{font-family:'Playfair Display',serif;font-size:1.3rem;color:var(--white);margin-bottom:8px;}
+    .role-desc{font-size:0.83rem;color:rgba(255,255,255,0.58);line-height:1.65;margin-bottom:20px;}
+    .role-btn{display:inline-block;padding:10px 24px;border-radius:8px;font-size:0.84rem;font-weight:700;font-family:'DM Sans',sans-serif;transition:all 0.2s;}
+    .role-btn-green{background:var(--leaf);color:var(--forest);}
+    .role-btn-gold{background:var(--gold);color:var(--forest);}
+    .role-card:hover .role-btn-green{background:var(--mint);}
+    .role-card:hover .role-btn-gold{background:#e8b520;}
+
+    .hero-wave{position:absolute;bottom:-2px;left:0;right:0;height:72px;}
+    .hero-wave svg{width:100%;height:100%;}
+
+    /* STATS */
+    .stats-strip{background:var(--mid);padding:28px 6%;display:flex;justify-content:center;}
+    .stat-item{flex:1;max-width:220px;text-align:center;padding:0 20px;position:relative;}
+    .stat-item+.stat-item::before{content:'';position:absolute;left:0;top:15%;height:70%;width:1px;background:rgba(255,255,255,0.15);}
+    .stat-num{font-family:'Playfair Display',serif;font-size:2.2rem;color:var(--gold);font-weight:900;line-height:1;}
+    .stat-label{font-size:0.79rem;color:rgba(255,255,255,0.63);margin-top:5px;font-weight:500;}
+
+    /* SECTION */
+    section{padding:80px 6%;}
+    .section-tag{display:inline-block;font-size:0.7rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--leaf);margin-bottom:0.7rem;}
+    .section-title{font-family:'Playfair Display',serif;font-size:clamp(1.7rem,3vw,2.4rem);line-height:1.2;color:var(--forest);margin-bottom:0.8rem;}
+    .section-sub{font-size:0.96rem;color:var(--muted);max-width:520px;line-height:1.7;margin-bottom:3rem;}
+    .center{text-align:center;}.center .section-sub{margin:0 auto 3rem;}
+
+    /* HOW IT WORKS */
+    .how{background:var(--white);}
+    .how-tabs{display:flex;gap:12px;justify-content:center;margin-bottom:36px;}
+    .how-tab{padding:10px 30px;border-radius:100px;font-size:0.88rem;font-weight:700;cursor:pointer;border:2px solid var(--pale);background:var(--white);color:var(--muted);transition:all 0.25s;font-family:'DM Sans',sans-serif;}
+    .how-tab.active-farmer{background:var(--forest);color:var(--white);border-color:var(--forest);}
+    .how-tab.active-owner{background:var(--gold);color:var(--forest);border-color:var(--gold);}
+    .steps-panel{display:none;}
+    .steps-panel.active{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:2px;background:var(--pale);border-radius:16px;overflow:hidden;}
+    .step{background:var(--white);padding:34px 26px;position:relative;transition:background 0.2s;}
+    .step:hover{background:var(--cream);}
+    .step-num{font-family:'Playfair Display',serif;font-size:3.2rem;font-weight:900;color:var(--pale);line-height:1;margin-bottom:10px;}
+    .step-icon{font-size:2rem;margin-bottom:10px;}
+    .step h3{font-size:0.97rem;font-weight:700;color:var(--forest);margin-bottom:7px;}
+    .step p{font-size:0.85rem;color:var(--muted);line-height:1.6;}
+    .step-arrow{position:absolute;right:14px;top:50%;transform:translateY(-50%);color:var(--pale);font-size:1.6rem;font-weight:900;}
+
+    /* FEATURES */
+    .features{background:var(--cream);}
+    .features-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px;}
+    .feat-card{background:var(--white);border-radius:16px;padding:28px;border:1px solid rgba(27,67,50,0.07);box-shadow:0 2px 14px rgba(27,67,50,0.05);transition:all 0.3s;}
+    .feat-card:hover{transform:translateY(-4px);box-shadow:0 10px 32px rgba(27,67,50,0.12);border-color:var(--leaf);}
+    .feat-icon{width:52px;height:52px;border-radius:14px;background:var(--pale);display:flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:16px;}
+    .feat-card h3{font-size:1rem;font-weight:700;color:var(--forest);margin-bottom:8px;}
+    .feat-card p{font-size:0.86rem;color:var(--muted);line-height:1.65;}
+    .feat-tag{display:inline-block;margin-top:12px;font-size:0.68rem;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;padding:3px 10px;border-radius:100px;}
+    .tag-both{background:var(--pale);color:var(--mid);}
+    .tag-farmer{background:rgba(82,183,136,0.12);color:var(--mid);}
+    .tag-owner{background:rgba(212,160,23,0.12);color:#9a6e00;}
+
+    /* WHO IS IT FOR */
+    
+
+    /* TESTIMONIALS */
+    .testimonials{background:var(--cream);}
+    .testi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px;}
+    .testi-card{background:var(--white);border-radius:16px;padding:26px;border-left:4px solid var(--leaf);box-shadow:0 2px 14px rgba(27,67,50,0.06);}
+    .testi-card.owner-testi{border-left-color:var(--gold);}
+    .testi-stars{color:var(--gold);font-size:0.9rem;margin-bottom:10px;letter-spacing:2px;}
+    .testi-text{font-size:0.88rem;color:var(--muted);line-height:1.7;margin-bottom:18px;}
+    .testi-author{display:flex;align-items:center;gap:11px;}
+    .testi-avatar{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:var(--white);}
+    .av-g{background:var(--mid);}
+    .av-o{background:#6B4C2A;}
+    .testi-name{font-weight:700;font-size:0.86rem;color:var(--forest);}
+    .testi-role{font-size:0.74rem;color:var(--muted);}
+    .rpill{display:inline-block;padding:2px 8px;border-radius:100px;font-size:0.64rem;font-weight:700;margin-left:5px;vertical-align:middle;}
+    .rpill-f{background:var(--pale);color:var(--mid);}
+    .rpill-o{background:rgba(212,160,23,0.15);color:#9a6e00;}
+
+    /* CTA */
+    .cta-banner{background:linear-gradient(135deg,var(--forest) 0%,var(--mid) 100%);padding:80px 6%;text-align:center;position:relative;overflow:hidden;}
+    .cta-banner::before{content:'';position:absolute;inset:0;background-image:radial-gradient(circle,rgba(82,183,136,0.08) 1px,transparent 1px);background-size:24px 24px;}
+    .cta-banner h2{font-family:'Playfair Display',serif;font-size:clamp(1.8rem,3.5vw,2.8rem);color:var(--white);margin-bottom:1rem;position:relative;}
+    .cta-banner > p{color:rgba(255,255,255,0.62);font-size:0.97rem;margin-bottom:2.8rem;position:relative;}
+    .cta-pair{display:flex;gap:20px;justify-content:center;flex-wrap:wrap;position:relative;}
+    .cta-box{background:rgba(255,255,255,0.07);border-radius:18px;padding:30px 36px;border:1.5px solid rgba(82,183,136,0.22);text-align:center;min-width:230px;transition:all 0.3s;}
+    .cta-box:hover{background:rgba(255,255,255,0.12);transform:translateY(-5px);}
+    .cta-box.gold-box{border-color:rgba(212,160,23,0.28);}
+    .cta-box-icon{font-size:2.6rem;margin-bottom:10px;}
+    .cta-box h3{font-size:1rem;font-weight:700;color:var(--white);margin-bottom:6px;}
+    .cta-box p{font-size:0.8rem;color:rgba(255,255,255,0.52);margin-bottom:18px;}
+    .btn-cta{display:inline-block;padding:10px 26px;border-radius:8px;font-size:0.86rem;font-weight:700;cursor:pointer;border:none;font-family:'DM Sans',sans-serif;transition:all 0.2s;text-decoration:none;}
+
+    /* FOOTER */
+    footer{background:#0d2218;padding:48px 6% 22px;}
+    .footer-grid{display:grid;grid-template-columns:1.6fr 1fr 1fr 1fr;gap:36px;padding-bottom:36px;border-bottom:1px solid rgba(255,255,255,0.07);margin-bottom:22px;}
+    .footer-brand p{font-size:0.82rem;color:rgba(255,255,255,0.42);margin-top:12px;line-height:1.7;}
+    .footer-col h4{font-size:0.73rem;font-weight:700;color:var(--mint);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:14px;}
+    .footer-col ul{list-style:none;display:flex;flex-direction:column;gap:8px;}
+    .footer-col ul a{font-size:0.83rem;color:rgba(255,255,255,0.42);text-decoration:none;transition:color 0.2s;}
+    .footer-col ul a:hover{color:var(--mint);}
+    .footer-bottom{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;}
+    .footer-bottom p{font-size:0.75rem;color:rgba(255,255,255,0.28);}
+
+    /* ANIMATIONS */
+    @keyframes fadeUp{from{opacity:0;transform:translateY(26px);}to{opacity:1;transform:translateY(0);}}
+    @keyframes pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.5;transform:scale(1.6);}}
+    .reveal{opacity:0;transform:translateY(26px);transition:opacity 0.65s ease,transform 0.65s ease;}
+    .reveal.visible{opacity:1;transform:none;}
+    .d1{transition-delay:0.1s;}.d2{transition-delay:0.2s;}.d3{transition-delay:0.3s;}
+
+    @media(max-width:900px){.who-grid{grid-template-columns:1fr;}.footer-grid{grid-template-columns:1fr 1fr;}}
+    @media(max-width:600px){nav ul{display:none;}.role-cards{flex-direction:column;align-items:center;}.cta-pair{flex-direction:column;align-items:center;}.footer-grid{grid-template-columns:1fr;}}
+  </style>
+</head>
+<body>
+
+<!-- ══ NAV ══════════════════════════════════════════════════════ -->
+<nav>
+  <a href="/" class="logo">
+    <div class="logo-icon">🌾</div>
+    <div class="logo-text">Kissan<span>Equipp</span></div>
+  </a>
+  <ul>
+    <li><a href="#how">How It Works</a></li>
+    <li><a href="#features">Features</a></li>
+    <li><a href="#who">Farmer &amp; Owner</a></li>
+    <li><a href="#about">About</a></li>
+  </ul>
+  <div class="nav-btns">
+    <button class="btn-login" onclick="window.location.href='/login'">Login</button>
+    <button class="btn-register" onclick="window.location.href='/register'">Register</button>
+  </div>
+</nav>
+
+
+
+
+<!-- ══ HERO ══════════════════════════════════════════════════════ -->
+
+<section class="who" id="who">
+  <div class="center" style="margin-bottom:3rem;position:relative;z-index:1;">
+    <div class="section-tag" style="color:var(--mint);">Two Roles, One Platform</div>
+    <h2 class="section-title" style="color:var(--white);">Built for Both Sides of Agriculture</h2>
+  </div>
+  <div class="who-grid">
+    <div class="who-card reveal">
+      <div class="who-header">
+        <div class="who-icon who-icon-green">👨‍🌾</div>
+        <div><div class="who-name">Farmer</div><div class="who-sub">Small &amp; marginal farmers across rural India</div></div>
+      </div>
+      <ul class="who-benefits">
+        <li><span class="bdot bdot-green">✓</span>Access expensive machinery without buying it</li>
+        <li><span class="bdot bdot-green">✓</span>Book tractors, harvesters, tillers on demand</li>
+        <li><span class="bdot bdot-green">✓</span>No middlemen — direct contact with owners</li>
+        <li><span class="bdot bdot-green">✓</span>Transparent pricing and real-time availability</li>
+        <li><span class="bdot bdot-green">✓</span>Reduce farming costs and prevent delays</li>
+      </ul>
+      <a href="/register?role=farmer" class="who-cta cta-green">Register as Farmer →</a>
+    </div>
+    <div class="who-card owner-card reveal d2">
+      <div class="who-header">
+        <div class="who-icon who-icon-gold">🚜</div>
+        <div><div class="who-name">Equipment Owner</div><div class="who-sub">Farmers, dealers &amp; cooperatives with machinery</div></div>
+      </div>
+      <ul class="who-benefits">
+        <li><span class="bdot bdot-gold">✓</span>Earn income from idle equipment</li>
+        <li><span class="bdot bdot-gold">✓</span>Reach hundreds of farmers in your area</li>
+        <li><span class="bdot bdot-gold">✓</span>Manage all bookings from your dashboard</li>
+        <li><span class="bdot bdot-gold">✓</span>Set your own pricing and availability slots</li>
+        <li><span class="bdot bdot-gold">✓</span>Build reputation through verified reviews</li>
+      </ul>
+      <a href="/register?role=owner" class="who-cta cta-gold">Register as Owner →</a>
+    </div>
+  </div>
+</section>
+
+
+
+
+
+<!-- ══ STATS ══════════════════════════════════════════════════════ -->
+<div class="stats-strip">
+  <div class="stat-item"><div class="stat-num" data-target="2400">0</div><div class="stat-label">Equipment Listed</div></div>
+  <div class="stat-item"><div class="stat-num" data-target="18000">0</div><div class="stat-label">Registered Farmers</div></div>
+  <div class="stat-item"><div class="stat-num" data-target="950">0</div><div class="stat-label">Equipment Owners</div></div>
+  <div class="stat-item"><div class="stat-num" data-target="340">0</div><div class="stat-label">Villages Covered</div></div>
+</div>
+
+<!-- ══ HOW IT WORKS ════════════════════════════════════════════════ -->
+
+<!-- ══ FEATURES ═══════════════════════════════════════════════════ -->
+<section class="features" id="features">
+  <div class="section-tag reveal">What We Offer</div>
+  <h2 class="section-title reveal">Platform Features</h2>
+  <p class="section-sub reveal">Everything needed for seamless equipment sharing — for both farmers and owners.</p>
+  <div class="features-grid">
+    <div class="feat-card reveal"><div class="feat-icon">📋</div><h3>Equipment Listings</h3><p>Owners list machinery with full details — type, HP, availability and price. Farmers browse with smart filters.</p><span class="feat-tag tag-both">Both Roles</span></div>
+    <div class="feat-card reveal d1"><div class="feat-icon">📅</div><h3>Availability Calendar</h3><p>Real-time calendar shows which dates each machine is free, booked, or unavailable — no guesswork.</p><span class="feat-tag tag-both">Both Roles</span></div>
+    <div class="feat-card reveal d2"><div class="feat-icon">⚡</div><h3>Instant Booking</h3><p>Farmers book directly without middlemen. Owners get instant notifications and confirm with one click.</p><span class="feat-tag tag-farmer">Farmer</span></div>
+    <div class="feat-card reveal d1"><div class="feat-icon">🔔</div><h3>SMS Notifications</h3><p>Both parties receive timely alerts for booking confirmations, reminders and cancellations.</p><span class="feat-tag tag-both">Both Roles</span></div>
+    <div class="feat-card reveal d2"><div class="feat-icon">⭐</div><h3>Ratings & Reviews</h3><p>Transparent review system builds community trust — farmers rate owners and owners rate farmers.</p><span class="feat-tag tag-both">Both Roles</span></div>
+  </div>
+</section>
+
+<!-- ══ WHO IS IT FOR ══════════════════════════════════════════════ -->
+
+<!-- ══ TESTIMONIALS ══════════════════════════════════════════════ -->
+<section class="testimonials" id="about">
+  <div class="section-tag reveal">Real Stories</div>
+  <h2 class="section-title reveal">What Our Users Say</h2>
+  <p class="section-sub reveal">Feedback from farmers and owners already using KrushiYantra.</p>
+  <div class="testi-grid">
+    <div class="testi-card reveal">
+      <div class="testi-stars">★★★★★</div>
+      <p class="testi-text">"I used to pay ₹3,000 extra to middlemen to find a tractor. Now I book directly and my harvest was done on time this kharif season. Saved almost 40%!"</p>
+      <div class="testi-author">
+        <div class="testi-avatar av-g">R</div>
+        <div><div class="testi-name">Ramaiah Goud <span class="rpill rpill-f">Farmer</span></div><div class="testi-role">Paddy Farmer · Nalgonda</div></div>
+      </div>
+    </div>
+    <div class="testi-card owner-testi reveal d1">
+      <div class="testi-stars">★★★★★</div>
+      <p class="testi-text">"My harvester was sitting idle for months every year. After listing it here it stayed booked for 22 days last season. My income went up by ₹80,000!"</p>
+      <div class="testi-author">
+        <div class="testi-avatar av-o">V</div>
+        <div><div class="testi-name">Venkata Swamy <span class="rpill rpill-o">Owner</span></div><div class="testi-role">Equipment Owner · Warangal</div></div>
+      </div>
+    </div>
+    <div class="testi-card reveal d2">
+      <div class="testi-stars">★★★★☆</div>
+      <p class="testi-text">"The booking was so simple — I searched for a tiller, picked the date and confirmed. The owner called me in 10 minutes. Transparent pricing, no surprises."</p>
+      <div class="testi-author">
+        <div class="testi-avatar av-g">S</div>
+        <div><div class="testi-name">Sunitha Devi <span class="rpill rpill-f">Farmer</span></div><div class="testi-role">Vegetable Farmer · Medak</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
+<!-- ══ FOOTER ═════════════════════════════════════════════════════ -->
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <div class="logo"><div class="logo-icon">🌾</div><div class="logo-text" style="font-size:1.1rem;">Kissan<span>Equipp</span></div></div>
+      <p>A digital platform bridging farmers and equipment owners — making agricultural machinery accessible, affordable and transparent for every farmer.</p>
+    </div>
+    <div class="footer-col">
+<h4>Platform</h4>
+<ul>
+
+<li><a href="/equipment">Browse Equipment</a></li>
+
+<li><a href="/register?role=owner">List Equipment</a></li>
+
+<li><a href="/login">My Bookings</a></li>
+
+<li><a href="/login">Dashboard</a></li>
+
+</ul>
+</div>
+    <div class="footer-col"><h4>Company</h4><ul><li><a href="#about">About Us</a></li><li><a href="#">Contact</a></li><li><a href="#">Help Center</a></li><li><a href="#">Community</a></li></ul></div>
+    <div class="footer-col"><h4>Legal</h4><ul><li><a href="#">Terms of Service</a></li><li><a href="#">Privacy Policy</a></li><li><a href="#">Rental Agreement</a></li><li><a href="#">Cancellation Policy</a></li></ul></div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2025 KrushiYantra · GRIET – Dept. of CSE (AI &amp; ML) · All rights reserved.</p>
+    <p>Made with ❤️ for Indian Farmers</p>
+  </div>
+</footer>
+
+<script>
+  function showTab(role, btn) {
+    document.querySelectorAll('.steps-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.how-tab').forEach(b => b.classList.remove('active-farmer','active-owner'));
+    document.getElementById('steps-' + role).classList.add('active');
+    btn.classList.add(role === 'farmer' ? 'active-farmer' : 'active-owner');
+  }
+
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  // Counter animation
+  function animateCounter(el, target) {
+    let current = 0;
+    const inc = target / 60;
+    const timer = setInterval(() => {
+      current += inc;
+      if (current >= target) { current = target; clearInterval(timer); }
+      const display = target >= 10000
+        ? (current/1000).toFixed(0) + 'k+'
+        : target >= 1000
+          ? (current/1000).toFixed(1) + 'k+'
+          : Math.floor(current) + '+';
+      el.textContent = display;
+    }, 25);
+  }
+
+  const statsObs = new IntersectionObserver(entries => {
+    if (entries[0].isIntersecting) {
+      document.querySelectorAll('.stat-num[data-target]').forEach(el => animateCounter(el, +el.dataset.target));
+      statsObs.disconnect();
+    }
+  }, { threshold: 0.5 });
+  statsObs.observe(document.querySelector('.stats-strip'));
+</script>
+</body>
+</html>
