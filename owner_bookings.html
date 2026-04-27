@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>My Bookings – KissanEquipp</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+  *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+  :root{
+    --forest:#1B4332;--mid:#2D6A4F;--leaf:#52B788;--mint:#95D5B2;
+    --pale:#D8F3DC;--cream:#F8FBF6;--gold:#D4A017;--gold-light:#F5C842;
+    --text:#1A2E1A;--muted:#5A7A5A;--white:#FFFFFF;
+    --danger:#EF4444;--blue:#3B82F6;--sidebar-w:260px;
+  }
+  html{scroll-behavior:smooth;}
+  body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--text);display:flex;min-height:100vh;overflow-x:hidden;}
+
+  /* ── SIDEBAR ── */
+  .sidebar{width:var(--sidebar-w);background:var(--forest);min-height:100vh;position:fixed;top:0;left:0;z-index:50;display:flex;flex-direction:column;transition:transform 0.3s;}
+  .sidebar::before{content:'';position:absolute;inset:0;background-image:radial-gradient(circle,rgba(82,183,136,0.06) 1px,transparent 1px);background-size:22px 22px;pointer-events:none;}
+
+  .sidebar-logo{display:flex;align-items:center;gap:10px;padding:26px 22px 20px;border-bottom:1px solid rgba(82,183,136,0.15);text-decoration:none;}
+  .logo-icon{width:38px;height:38px;background:var(--leaf);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+  .logo-text{font-family:'Playfair Display',serif;font-size:1.2rem;color:var(--white);}
+  .logo-text span{color:var(--gold);}
+
+  .sidebar-user{padding:18px 22px;border-bottom:1px solid rgba(82,183,136,0.12);display:flex;align-items:center;gap:12px;}
+  .user-avatar{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--leaf),var(--mid));display:flex;align-items:center;justify-content:center;font-size:1.1rem;font-weight:700;color:var(--white);flex-shrink:0;border:2px solid rgba(82,183,136,0.4);}
+  .user-info .user-name{font-size:0.9rem;font-weight:700;color:var(--white);line-height:1.2;}
+  .user-info .user-role{font-size:0.72rem;color:var(--leaf);font-weight:600;letter-spacing:0.04em;text-transform:uppercase;}
+
+  .sidebar-nav{flex:1;padding:18px 14px;display:flex;flex-direction:column;gap:4px;position:relative;z-index:1;}
+  .nav-label{font-size:0.62rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.28);padding:10px 8px 6px;}
+  .nav-item{display:flex;align-items:center;gap:11px;padding:11px 14px;border-radius:10px;text-decoration:none;color:rgba(255,255,255,0.55);font-size:0.88rem;font-weight:500;transition:all 0.2s;}
+  .nav-item:hover{background:rgba(82,183,136,0.1);color:rgba(255,255,255,0.9);}
+  .nav-item.active{background:rgba(82,183,136,0.18);color:var(--white);font-weight:700;}
+  .nav-icon{font-size:1.15rem;width:22px;text-align:center;flex-shrink:0;}
+
+  .sidebar-footer{padding:16px 14px;border-top:1px solid rgba(82,183,136,0.12);position:relative;z-index:1;}
+  .logout-btn{display:flex;align-items:center;gap:11px;padding:11px 14px;border-radius:10px;color:rgba(255,255,255,0.45);font-size:0.88rem;font-weight:500;text-decoration:none;transition:all 0.2s;}
+  .logout-btn:hover{background:rgba(255,80,80,0.12);color:#ff6b6b;}
+
+  /* ── MAIN ── */
+  .main{margin-left:var(--sidebar-w);flex:1;display:flex;flex-direction:column;min-height:100vh;}
+
+  /* TOP BAR */
+  .topbar{background:var(--white);border-bottom:1px solid rgba(27,67,50,0.08);padding:0 32px;height:64px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:40;box-shadow:0 2px 12px rgba(27,67,50,0.05);}
+  .page-title{font-family:'Playfair Display',serif;font-size:1.2rem;color:var(--forest);}
+  .btn-back{display:flex;align-items:center;gap:7px;padding:8px 16px;background:var(--pale);border:1.5px solid rgba(27,67,50,0.1);border-radius:10px;color:var(--forest);font-size:0.83rem;font-weight:700;text-decoration:none;transition:all 0.2s;font-family:'DM Sans',sans-serif;}
+  .btn-back:hover{background:var(--leaf);color:var(--white);border-color:var(--leaf);}
+
+  /* CONTENT */
+  .content{padding:28px 32px;flex:1;}
+
+  /* PAGE BANNER */
+  .page-banner{background:linear-gradient(135deg,var(--forest) 0%,var(--mid) 100%);border-radius:20px;padding:26px 32px;margin-bottom:28px;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:space-between;}
+  .page-banner::before{content:'';position:absolute;inset:0;background-image:radial-gradient(circle,rgba(82,183,136,0.08) 1px,transparent 1px);background-size:22px 22px;pointer-events:none;}
+  .banner-text{position:relative;z-index:1;}
+  .banner-label{font-size:0.78rem;color:var(--mint);font-weight:600;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:4px;}
+  .banner-text h1{font-family:'Playfair Display',serif;font-size:1.6rem;color:var(--white);margin-bottom:5px;}
+  .banner-text p{font-size:0.85rem;color:rgba(255,255,255,0.5);max-width:420px;}
+  .banner-art{font-size:4.5rem;opacity:0.15;position:absolute;right:32px;top:50%;transform:translateY(-50%);line-height:1;}
+
+  /* STATS */
+  .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px;}
+  .stat-card{background:var(--white);border-radius:16px;padding:20px;border:1px solid rgba(27,67,50,0.07);box-shadow:0 2px 12px rgba(27,67,50,0.05);transition:all 0.3s;position:relative;overflow:hidden;}
+  .stat-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;}
+  .stat-card.s1::after{background:var(--leaf);}
+  .stat-card.s2::after{background:var(--gold);}
+  .stat-card.s3::after{background:#22c55e;}
+  .stat-card.s4::after{background:var(--blue);}
+  .stat-card:hover{transform:translateY(-3px);box-shadow:0 8px 28px rgba(27,67,50,0.1);}
+  .stat-icon{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;margin-bottom:12px;}
+  .ic-green{background:var(--pale);}
+  .ic-gold{background:rgba(212,160,23,0.12);}
+  .ic-lime{background:rgba(34,197,94,0.1);}
+  .ic-blue{background:rgba(59,130,246,0.1);}
+  .stat-val{font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:900;color:var(--forest);line-height:1;}
+  .stat-val.gold{color:var(--gold);}
+  .stat-val.lime{color:#22c55e;}
+  .stat-val.blue{color:var(--blue);}
+  .stat-lbl{font-size:0.77rem;color:var(--muted);margin-top:4px;font-weight:500;}
+  .stat-sub{font-size:0.71rem;color:var(--muted);margin-top:5px;}
+
+  /* FILTER BAR */
+  .filter-row{display:flex;align-items:center;gap:8px;margin-bottom:20px;flex-wrap:wrap;}
+  .filter-btn{padding:8px 16px;border-radius:10px;font-size:0.82rem;font-weight:600;cursor:pointer;border:1.5px solid rgba(27,67,50,0.1);background:var(--white);color:var(--muted);font-family:'DM Sans',sans-serif;transition:all 0.2s;}
+  .filter-btn:hover{background:var(--pale);color:var(--forest);border-color:var(--leaf);}
+  .filter-btn.active{background:var(--forest);color:var(--white);border-color:var(--forest);}
+  .search-wrap{margin-left:auto;position:relative;}
+  .search-wrap input{background:var(--white);border:1.5px solid rgba(27,67,50,0.1);border-radius:10px;padding:8px 14px 8px 36px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:0.86rem;outline:none;width:230px;transition:border 0.2s;}
+  .search-wrap input:focus{border-color:var(--leaf);}
+  .search-wrap input::placeholder{color:var(--muted);}
+  .search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:0.9rem;pointer-events:none;color:var(--muted);}
+
+  /* TABLE CARD */
+  .table-card{background:var(--white);border-radius:18px;border:1px solid rgba(27,67,50,0.07);box-shadow:0 2px 12px rgba(27,67,50,0.05);overflow:hidden;}
+  .table-top{padding:18px 24px;border-bottom:1px solid rgba(27,67,50,0.06);display:flex;align-items:center;justify-content:space-between;}
+  .table-top-title{font-size:0.95rem;font-weight:700;color:var(--forest);}
+  .table-top-count{font-size:0.78rem;color:var(--muted);font-weight:500;}
+
+  table{width:100%;border-collapse:collapse;}
+  thead th{padding:11px 18px;text-align:left;font-size:0.68rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;background:var(--cream);border-bottom:1px solid rgba(27,67,50,0.06);}
+  tbody tr{border-bottom:1px solid rgba(27,67,50,0.05);transition:background 0.15s;animation:fadeUp 0.35s ease both;}
+  tbody tr:last-child{border-bottom:none;}
+  tbody tr:hover{background:var(--cream);}
+  tbody tr:nth-child(1){animation-delay:.04s}tbody tr:nth-child(2){animation-delay:.08s}
+  tbody tr:nth-child(3){animation-delay:.12s}tbody tr:nth-child(4){animation-delay:.16s}
+  tbody tr:nth-child(5){animation-delay:.20s}tbody tr:nth-child(6){animation-delay:.24s}
+  td{padding:13px 18px;font-size:0.86rem;vertical-align:middle;}
+
+  /* FARMER CELL */
+  .farmer-cell{display:flex;align-items:center;gap:10px;}
+  .farmer-avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--leaf),var(--mid));display:flex;align-items:center;justify-content:center;font-size:0.85rem;font-weight:700;color:var(--white);flex-shrink:0;}
+  .farmer-name{font-weight:700;font-size:0.87rem;color:var(--forest);}
+  .farmer-role{font-size:0.72rem;color:var(--muted);}
+
+  /* EQUIP CELL */
+  .equip-cell{display:flex;align-items:center;gap:8px;}
+  .equip-icon{width:36px;height:36px;border-radius:9px;background:var(--pale);display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;}
+  .equip-name{font-weight:600;font-size:0.87rem;color:var(--forest);}
+  .equip-cat{font-size:0.72rem;color:var(--muted);}
+
+  /* STATUS PILLS */
+  .status-pill{display:inline-flex;align-items:center;gap:5px;padding:4px 11px;border-radius:100px;font-size:0.65rem;font-weight:800;letter-spacing:0.04em;text-transform:uppercase;}
+  .status-pill::before{content:'';width:6px;height:6px;border-radius:50%;}
+  .sp-pending{background:rgba(212,160,23,0.12);color:#9a6e00;}
+  .sp-pending::before{background:var(--gold);}
+  .sp-confirmed{background:rgba(82,183,136,0.12);color:var(--mid);}
+  .sp-confirmed::before{background:var(--leaf);}
+  .sp-completed{background:rgba(59,130,246,0.1);color:#2563eb;}
+  .sp-completed::before{background:var(--blue);}
+  .sp-cancelled{background:rgba(239,68,68,0.08);color:#dc2626;}
+  .sp-cancelled::before{background:var(--danger);}
+
+  .amount-txt{font-weight:700;color:var(--mid);font-size:0.9rem;}
+  .date-txt{font-size:0.83rem;color:var(--text);}
+  .id-txt{font-size:0.78rem;color:var(--muted);}
+
+  /* ACTION BUTTONS */
+  .action-btns{display:flex;gap:6px;align-items:center;}
+  .icon-btn{width:32px;height:32px;border-radius:8px;border:1.5px solid rgba(27,67,50,0.1);background:var(--cream);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:0.9rem;transition:all 0.2s;text-decoration:none;}
+  .icon-btn:hover{border-color:var(--leaf);background:var(--pale);}
+  .icon-btn.approve:hover{border-color:#22c55e;background:rgba(34,197,94,0.1);}
+  .icon-btn.reject:hover{border-color:var(--danger);background:rgba(239,68,68,0.08);}
+
+  /* EMPTY STATE */
+  .empty-state{padding:56px 20px;text-align:center;color:var(--muted);}
+  .empty-icon{font-size:3rem;margin-bottom:12px;opacity:0.35;}
+  .empty-title{font-size:1rem;font-weight:700;margin-bottom:4px;}
+  .empty-sub{font-size:0.82rem;opacity:0.7;}
+
+  /* ANIMATIONS */
+  @keyframes fadeUp{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
+  .anim{animation:fadeUp 0.45s ease both;}
+  .d1{animation-delay:.06s}.d2{animation-delay:.12s}.d3{animation-delay:.18s}.d4{animation-delay:.24s}
+
+  @media(max-width:1100px){.stats-grid{grid-template-columns:1fr 1fr;}}
+  @media(max-width:768px){.sidebar{transform:translateX(-100%);}.main{margin-left:0;}.content{padding:20px 16px;}.topbar{padding:0 16px;}.search-wrap input{width:160px;}}
+</style>
+</head>
+<body>
+
+<!-- ══ SIDEBAR ══════════════════════════════════════════════════ -->
+<aside class="sidebar">
+  <a href="{{ url_for('home') }}" class="sidebar-logo">
+    <div class="logo-icon">🌾</div>
+    <div class="logo-text">Kissan<span>Equipp</span></div>
+  </a>
+
+  <div class="sidebar-user">
+    <div class="user-avatar">{{ session.name[0]|upper }}</div>
+    <div class="user-info">
+      <div class="user-name">{{ session.name }}</div>
+      <div class="user-role">🔧 Equipment Owner</div>
+    </div>
+  </div>
+
+  <nav class="sidebar-nav">
+    <div class="nav-label">Main Menu</div>
+    <a href="{{ url_for('owner_dashboard') }}" class="nav-item">
+      <span class="nav-icon">🏠</span> Dashboard
+    </a>
+    <a href="#" class="nav-item active">
+      <span class="nav-icon">📋</span> My Bookings
+    </a>
+        <a class="nav-item" href="{{ url_for('owner_equipment') }}">
+      <span class="icon">🚜</span> My Equipment
+    </a>
+    <a href="{{ url_for('add_equipment') }}" class="nav-item">
+      <span class="nav-icon">🚜</span> Add Equipment
+    </a>
+
+    <div class="nav-label">Finance</div>
+    <a href="{{ url_for('earnings') }}" class="nav-item">
+      <span class="nav-icon">💰</span> Earnings
+    </a>
+  </nav>
+
+  <div class="sidebar-footer">
+    <a href="{{ url_for('logout') }}" class="logout-btn">
+      <span class="nav-icon">🚪</span> Logout
+    </a>
+  </div>
+</aside>
+
+<!-- ══ MAIN ══════════════════════════════════════════════════════ -->
+<div class="main">
+
+  <!-- TOP BAR -->
+  <header class="topbar">
+    <span class="page-title">My Bookings</span>
+    <a href="{{ url_for('owner_dashboard') }}" class="btn-back">← Dashboard</a>
+  </header>
+
+  <!-- CONTENT -->
+  <main class="content">
+
+    <!-- PAGE BANNER -->
+    <div class="page-banner anim">
+      <div class="banner-text">
+        <div class="banner-label">Rental Requests 📋</div>
+        <h1>Track & Manage Bookings</h1>
+        <p>View all rental requests from farmers, approve or reject them in one place.</p>
+      </div>
+      <div class="banner-art">📅</div>
+    </div>
+
+    <!-- STATS -->
+    <div class="stats-grid">
+      <div class="stat-card s1 anim d1">
+        <div class="stat-icon ic-green">📋</div>
+        <div class="stat-val">{{ bookings|length }}</div>
+        <div class="stat-lbl">Total Bookings</div>
+        <div class="stat-sub">All time</div>
+      </div>
+      <div class="stat-card s2 anim d2">
+        <div class="stat-icon ic-gold">⏳</div>
+        <div class="stat-val gold">{{ bookings|selectattr(5,'equalto','pending')|list|length }}</div>
+        <div class="stat-lbl">Pending</div>
+        <div class="stat-sub">Awaiting approval</div>
+      </div>
+      <div class="stat-card s3 anim d3">
+        <div class="stat-icon ic-lime">✅</div>
+        <div class="stat-val lime">{{ bookings|selectattr(5,'equalto','confirmed')|list|length }}</div>
+        <div class="stat-lbl">Confirmed</div>
+        <div class="stat-sub">Active rentals</div>
+      </div>
+      <div class="stat-card s4 anim d4">
+        <div class="stat-icon ic-blue">💰</div>
+        <div class="stat-val blue">₹{{ bookings|sum(attribute=4)|int }}</div>
+        <div class="stat-lbl">Total Earned</div>
+        <div class="stat-sub">Gross revenue</div>
+      </div>
+    </div>
+
+    <!-- FILTER BAR -->
+    <div class="filter-row anim">
+      <button class="filter-btn active" onclick="filterTable('all',this)">All</button>
+      <button class="filter-btn" onclick="filterTable('pending',this)">⏳ Pending</button>
+      <button class="filter-btn" onclick="filterTable('confirmed',this)">✅ Confirmed</button>
+      <button class="filter-btn" onclick="filterTable('completed',this)">🏁 Completed</button>
+      <button class="filter-btn" onclick="filterTable('cancelled',this)">✕ Cancelled</button>
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="searchInput" placeholder="Search farmer or equipment…" oninput="searchTable()"/>
+      </div>
+    </div>
+
+    <!-- TABLE CARD -->
+    <div class="table-card anim">
+      <div class="table-top">
+        <span class="table-top-title">Booking Records</span>
+        <span class="table-top-count" id="visibleCount"></span>
+      </div>
+      <table id="bookingTable">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Farmer</th>
+            <th>Equipment</th>
+            <th>Date</th>
+            <th>Amount</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody">
+          {% for b in bookings %}
+          <tr data-status="{{ b[5]|lower }}"
+              data-farmer="{{ b[1]|lower }}"
+              data-equip="{{ b[2]|lower }}">
+
+            <td><span class="id-txt">#{{ loop.index }}</span></td>
+
+            <td>
+              <div class="farmer-cell">
+                <div class="farmer-avatar">{{ b[1][0]|upper }}</div>
+                <div>
+                  <div class="farmer-name">{{ b[1] }}</div>
+                  <div class="farmer-role">Farmer</div>
+                </div>
+              </div>
+            </td>
+
+            <td>
+              <div class="equip-cell">
+                <div class="equip-icon">🚜</div>
+                <div>
+                  <div class="equip-name">{{ b[2] }}</div>
+                  <div class="equip-cat">Equipment</div>
+                </div>
+              </div>
+            </td>
+
+            <td><span class="date-txt">{{ b[3] }}</span></td>
+
+            <td><span class="amount-txt">₹{{ b[4] }}</span></td>
+
+            <td>
+              {% set s = b[5]|lower %}
+              <span class="status-pill sp-{{ s }}">{{ b[5] }}</span>
+            </td>
+
+            <td>
+              <div class="action-btns">
+                <a href="{{ url_for('view_booking', id=b[0]) }}" class="icon-btn" title="View">👁️</a>
+                {% if b[5]|lower == 'pending' %}
+                  <a href="{{ url_for('approve_booking', booking_id=b[0]) }}" class="icon-btn approve" title="Approve">✅</a>
+                  <a href="{{ url_for('reject_booking', booking_id=b[0]) }}" class="icon-btn reject" title="Reject">❌</a>
+                {% endif %}
+              </div>
+            </td>
+
+          </tr>
+          {% else %}
+          <tr>
+            <td colspan="7">
+              <div class="empty-state">
+                <div class="empty-icon">📋</div>
+                <div class="empty-title">No bookings yet</div>
+                <div class="empty-sub">Rental requests from farmers will appear here</div>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+  </main>
+</div>
+
+<script>
+  let activeFilter = 'all';
+
+  function filterTable(status, btn) {
+    activeFilter = status;
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    applyFilters();
+  }
+
+  function searchTable() { applyFilters(); }
+
+  function applyFilters() {
+    const q = document.getElementById('searchInput').value.toLowerCase();
+    const rows = document.querySelectorAll('#tableBody tr[data-status]');
+    let visible = 0;
+
+    rows.forEach(row => {
+      const statusMatch = activeFilter === 'all' || row.dataset.status === activeFilter;
+      const searchMatch = !q || row.dataset.farmer.includes(q) || row.dataset.equip.includes(q);
+      const show = statusMatch && searchMatch;
+      row.style.display = show ? '' : 'none';
+      if (show) visible++;
+    });
+
+    const countEl = document.getElementById('visibleCount');
+    countEl.textContent = visible + ' booking' + (visible !== 1 ? 's' : '');
+  }
+
+  document.addEventListener('DOMContentLoaded', () => { applyFilters(); });
+</script>
+</body>
+</html>
