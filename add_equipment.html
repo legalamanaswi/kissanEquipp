@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Add Equipment – KissanEquipp</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+  *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+  :root{
+    --forest:#1B4332;--mid:#2D6A4F;--leaf:#52B788;--mint:#95D5B2;
+    --pale:#D8F3DC;--cream:#F8FBF6;--gold:#D4A017;--gold-light:#F5C842;
+    --text:#1A2E1A;--muted:#5A7A5A;--white:#FFFFFF;
+    --danger:#EF4444;--sidebar-w:260px;
+  }
+  html{scroll-behavior:smooth;}
+  body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--text);display:flex;min-height:100vh;overflow-x:hidden;}
+
+  /* ── SIDEBAR ── */
+  .sidebar{width:var(--sidebar-w);background:var(--forest);min-height:100vh;position:fixed;top:0;left:0;z-index:50;display:flex;flex-direction:column;transition:transform 0.3s;}
+  .sidebar::before{content:'';position:absolute;inset:0;background-image:radial-gradient(circle,rgba(82,183,136,0.06) 1px,transparent 1px);background-size:22px 22px;pointer-events:none;}
+
+  .sidebar-logo{display:flex;align-items:center;gap:10px;padding:26px 22px 20px;border-bottom:1px solid rgba(82,183,136,0.15);text-decoration:none;}
+  .logo-icon{width:38px;height:38px;background:var(--leaf);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+  .logo-text{font-family:'Playfair Display',serif;font-size:1.2rem;color:var(--white);}
+  .logo-text span{color:var(--gold);}
+
+  .sidebar-user{padding:18px 22px;border-bottom:1px solid rgba(82,183,136,0.12);display:flex;align-items:center;gap:12px;}
+  .user-avatar{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--leaf),var(--mid));display:flex;align-items:center;justify-content:center;font-size:1.1rem;font-weight:700;color:var(--white);flex-shrink:0;border:2px solid rgba(82,183,136,0.4);}
+  .user-info .user-name{font-size:0.9rem;font-weight:700;color:var(--white);line-height:1.2;}
+  .user-info .user-role{font-size:0.72rem;color:var(--leaf);font-weight:600;letter-spacing:0.04em;text-transform:uppercase;}
+
+  .sidebar-nav{flex:1;padding:18px 14px;display:flex;flex-direction:column;gap:4px;position:relative;z-index:1;}
+  .nav-label{font-size:0.62rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.28);padding:10px 8px 6px;}
+  .nav-item{display:flex;align-items:center;gap:11px;padding:11px 14px;border-radius:10px;text-decoration:none;color:rgba(255,255,255,0.55);font-size:0.88rem;font-weight:500;transition:all 0.2s;}
+  .nav-item:hover{background:rgba(82,183,136,0.1);color:rgba(255,255,255,0.9);}
+  .nav-item.active{background:rgba(82,183,136,0.18);color:var(--white);font-weight:700;}
+  .nav-icon{font-size:1.15rem;width:22px;text-align:center;flex-shrink:0;}
+
+  .sidebar-footer{padding:16px 14px;border-top:1px solid rgba(82,183,136,0.12);position:relative;z-index:1;}
+  .logout-btn{display:flex;align-items:center;gap:11px;padding:11px 14px;border-radius:10px;color:rgba(255,255,255,0.45);font-size:0.88rem;font-weight:500;text-decoration:none;transition:all 0.2s;}
+  .logout-btn:hover{background:rgba(255,80,80,0.12);color:#ff6b6b;}
+
+  /* ── MAIN ── */
+  .main{margin-left:var(--sidebar-w);flex:1;display:flex;flex-direction:column;min-height:100vh;}
+
+  /* TOP BAR */
+  .topbar{background:var(--white);border-bottom:1px solid rgba(27,67,50,0.08);padding:0 32px;height:64px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:40;box-shadow:0 2px 12px rgba(27,67,50,0.05);}
+  .page-title{font-family:'Playfair Display',serif;font-size:1.2rem;color:var(--forest);}
+  .btn-back{display:flex;align-items:center;gap:7px;padding:8px 16px;background:var(--pale);border:1.5px solid rgba(27,67,50,0.1);border-radius:10px;color:var(--forest);font-size:0.83rem;font-weight:700;text-decoration:none;transition:all 0.2s;font-family:'DM Sans',sans-serif;}
+  .btn-back:hover{background:var(--leaf);color:var(--white);border-color:var(--leaf);}
+
+  /* CONTENT */
+  .content{padding:28px 32px;flex:1;}
+
+  /* PAGE BANNER */
+  .page-banner{background:linear-gradient(135deg,var(--forest) 0%,var(--mid) 100%);border-radius:20px;padding:26px 32px;margin-bottom:28px;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:space-between;}
+  .page-banner::before{content:'';position:absolute;inset:0;background-image:radial-gradient(circle,rgba(82,183,136,0.08) 1px,transparent 1px);background-size:22px 22px;pointer-events:none;}
+  .banner-text{position:relative;z-index:1;}
+  .banner-label{font-size:0.78rem;color:var(--mint);font-weight:600;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:4px;}
+  .banner-text h1{font-family:'Playfair Display',serif;font-size:1.6rem;color:var(--white);margin-bottom:5px;}
+  .banner-text p{font-size:0.85rem;color:rgba(255,255,255,0.5);max-width:420px;}
+  .banner-art{font-size:4.5rem;opacity:0.15;position:absolute;right:32px;top:50%;transform:translateY(-50%);line-height:1;}
+
+  /* TWO-COL LAYOUT */
+  .form-layout{display:grid;grid-template-columns:1fr 380px;gap:24px;align-items:start;}
+
+  /* SECTION CARDS */
+  .section-card{background:var(--white);border-radius:18px;border:1px solid rgba(27,67,50,0.07);box-shadow:0 2px 12px rgba(27,67,50,0.05);overflow:hidden;margin-bottom:20px;}
+  .sc-header{padding:18px 24px;border-bottom:1px solid rgba(27,67,50,0.06);display:flex;align-items:center;gap:10px;}
+  .sc-icon{width:36px;height:36px;border-radius:10px;background:var(--pale);display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;}
+  .sc-title{font-size:0.95rem;font-weight:700;color:var(--forest);}
+  .sc-sub{font-size:0.75rem;color:var(--muted);margin-top:1px;}
+  .sc-body{padding:22px 24px;}
+
+  /* FORM ELEMENTS */
+  .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  .form-group{display:flex;flex-direction:column;gap:7px;}
+  .form-group.full{grid-column:1/-1;}
+  label{font-size:0.72rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;}
+
+  input[type="text"],
+  input[type="number"],
+  select,
+  textarea{
+    background:var(--cream);
+    border:1.5px solid rgba(27,67,50,0.1);
+    border-radius:10px;
+    padding:10px 14px;
+    color:var(--text);
+    font-family:'DM Sans',sans-serif;
+    font-size:0.88rem;
+    outline:none;
+    transition:border 0.2s,background 0.2s;
+    width:100%;
+  }
+  input:focus,select:focus,textarea:focus{
+    border-color:var(--leaf);
+    background:var(--white);
+  }
+  input::placeholder,textarea::placeholder{color:var(--muted);}
+  textarea{resize:vertical;min-height:90px;}
+  select option{background:var(--white);}
+
+  /* FILE INPUT */
+  .file-input-wrap{position:relative;}
+  .file-input-wrap input[type="file"]{
+    background:var(--cream);
+    border:1.5px dashed rgba(27,67,50,0.2);
+    border-radius:10px;
+    padding:10px 14px;
+    cursor:pointer;
+    color:var(--muted);
+    font-size:0.85rem;
+  }
+  .file-input-wrap input[type="file"]:focus{border-color:var(--leaf);}
+  .current-img-note{font-size:0.75rem;color:var(--muted);margin-top:6px;padding:6px 10px;background:var(--cream);border-radius:8px;border:1px solid rgba(27,67,50,0.07);}
+
+  /* EMOJI PICKER */
+  .emoji-picker{display:flex;gap:8px;flex-wrap:wrap;}
+  .emoji-opt{width:44px;height:44px;border-radius:11px;border:1.5px solid rgba(27,67,50,0.1);background:var(--cream);display:flex;align-items:center;justify-content:center;font-size:1.3rem;cursor:pointer;transition:all 0.2s;}
+  .emoji-opt:hover{background:var(--pale);border-color:var(--leaf);}
+  .emoji-opt.selected{border-color:var(--leaf);background:var(--pale);box-shadow:0 0 0 3px rgba(82,183,136,0.15);}
+
+  /* MAP CARD */
+  .map-section{background:var(--white);border-radius:18px;border:1px solid rgba(27,67,50,0.07);box-shadow:0 2px 12px rgba(27,67,50,0.05);overflow:hidden;margin-bottom:20px;}
+  .map-header{padding:18px 24px;border-bottom:1px solid rgba(27,67,50,0.06);display:flex;align-items:center;gap:10px;}
+  #map{height:280px;width:100%;}
+  .map-hint{padding:12px 24px;background:var(--cream);border-top:1px solid rgba(27,67,50,0.06);font-size:0.78rem;color:var(--muted);display:flex;align-items:center;gap:7px;}
+
+  /* FORM ACTIONS */
+  .form-actions{display:flex;gap:12px;margin-top:4px;}
+  .btn-submit{display:inline-flex;align-items:center;gap:8px;padding:11px 24px;background:var(--leaf);color:var(--forest);border:none;border-radius:11px;font-size:0.9rem;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.2s;}
+  .btn-submit:hover{background:var(--mint);}
+  .btn-cancel{display:inline-flex;align-items:center;gap:8px;padding:11px 20px;background:var(--cream);color:var(--muted);border:1.5px solid rgba(27,67,50,0.1);border-radius:11px;font-size:0.9rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.2s;text-decoration:none;}
+  .btn-cancel:hover{background:var(--pale);color:var(--forest);border-color:var(--leaf);}
+
+  /* TIPS CARD */
+  .tips-card{background:var(--white);border-radius:18px;border:1px solid rgba(27,67,50,0.07);box-shadow:0 2px 12px rgba(27,67,50,0.05);padding:22px 24px;}
+  .tips-title{font-size:0.9rem;font-weight:700;color:var(--forest);margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+  .tip-item{display:flex;align-items:flex-start;gap:10px;margin-bottom:12px;}
+  .tip-icon{width:28px;height:28px;border-radius:8px;background:var(--pale);display:flex;align-items:center;justify-content:center;font-size:0.85rem;flex-shrink:0;margin-top:1px;}
+  .tip-text{font-size:0.8rem;color:var(--muted);line-height:1.5;}
+  .tip-text strong{color:var(--forest);display:block;font-size:0.82rem;margin-bottom:1px;}
+
+  /* FLASH */
+  .flash-msg{padding:12px 20px;border-radius:10px;margin-bottom:20px;font-size:0.87rem;font-weight:600;display:flex;align-items:center;gap:10px;}
+  .flash-success{background:rgba(82,183,136,0.12);border:1px solid rgba(82,183,136,0.3);color:var(--mid);}
+  .flash-error{background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.25);color:#dc2626;}
+
+  /* ANIMATIONS */
+  @keyframes fadeUp{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
+  .anim{animation:fadeUp 0.45s ease both;}
+  .d1{animation-delay:.06s}.d2{animation-delay:.12s}.d3{animation-delay:.18s}
+
+  @media(max-width:1100px){.form-layout{grid-template-columns:1fr;}}
+  @media(max-width:768px){.sidebar{transform:translateX(-100%);}.main{margin-left:0;}.content{padding:20px 16px;}.topbar{padding:0 16px;}.form-grid{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+
+<!-- ══ SIDEBAR ══════════════════════════════════════════════════ -->
+<aside class="sidebar">
+  <a href="{{ url_for('home') }}" class="sidebar-logo">
+    <div class="logo-icon">🌾</div>
+    <div class="logo-text">Kissan<span>Equipp</span></div>
+  </a>
+
+  <div class="sidebar-user">
+    <div class="user-avatar">R</div>
+    <div class="user-info">
+      <div class="user-name">Ramesh Kumar</div>
+      <div class="user-role">🔧 Equipment Owner</div>
+    </div>
+  </div>
+
+  <nav class="sidebar-nav">
+    <div class="nav-label">Main Menu</div>
+    <a href="{{ url_for('owner_dashboard') }}" class="nav-item">
+      <span class="nav-icon">🏠</span> Dashboard
+    </a>
+    <a class="nav-item" href="{{ url_for('owner_equipment') }}">
+      <span class="icon">🚜</span> My Equipment
+    </a>
+     <a class="nav-item" href="{{ url_for('owner_bookings') }}">
+      <span class="icon">📋</span> Bookings
+    </a>
+    <a href="{{ url_for('add_equipment') }}" class="nav-item active">
+      <span class="nav-icon">➕</span> Add Equipment
+    </a>
+
+
+    <div class="nav-label">Finance</div>
+    <a href="#" class="nav-item">
+      <span class="nav-icon">💰</span> Earnings
+    </a>
+
+    <div class="nav-label">Account</div>
+    <a href="{{ url_for('profile') }}" class="nav-item">
+      <span class="nav-icon">👤</span> Profile
+    </a>
+  </nav>
+
+  <div class="sidebar-footer">
+    <a href="{{ url_for('logout') }}" class="logout-btn">
+      <span class="nav-icon">🚪</span> Logout
+    </a>
+  </div>
+</aside>
+
+<!-- ══ MAIN ══════════════════════════════════════════════════════ -->
+<div class="main">
+
+  <!-- TOP BAR -->
+  <header class="topbar">
+    <span class="page-title">{{ 'Edit Equipment' if edit else 'Add Equipment' }}</span>
+    <a href="{{ url_for('owner_dashboard') }}" class="btn-back">← Back</a>
+  </header>
+
+  <!-- CONTENT -->
+  <main class="content">
+
+    <!-- Flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="flash-msg flash-{{ category }}">
+            {{ '✅' if category == 'success' else '⚠️' }} {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <!-- PAGE BANNER -->
+    <div class="page-banner anim">
+      <div class="banner-text">
+        <div class="banner-label">List Your Machine 🚜</div>
+        <h1>{{ 'Update Equipment' if edit else 'Add New Equipment' }}</h1>
+        <p>Fill in the details below to list your machinery for rental — reach farmers near you.</p>
+      </div>
+      <div class="banner-art">➕</div>
+    </div>
+
+    <!-- FORM -->
+    <form method="POST"
+      action="{% if edit %}{{ url_for('edit_equipment', id=equipment[0]) }}{% else %}{{ url_for('add_equipment') }}{% endif %}"
+      enctype="multipart/form-data">
+
+      <!-- Hidden lat/lng inputs -->
+      <input type="hidden" name="lat" id="lat"/>
+      <input type="hidden" name="lng" id="lng"/>
+
+      <div class="form-layout">
+
+        <!-- LEFT COLUMN -->
+        <div>
+
+          <!-- BASIC INFO -->
+          <div class="section-card anim d1">
+            <div class="sc-header">
+              <div class="sc-icon">📋</div>
+              <div>
+                <div class="sc-title">Basic Information</div>
+                <div class="sc-sub">Name, category, price and status</div>
+              </div>
+            </div>
+            <div class="sc-body">
+              <div class="form-grid">
+
+                <div class="form-group">
+                  <label>Equipment Name *</label>
+                  <input type="text" name="equipment_name"
+                    placeholder="e.g. Mahindra 575 DI"
+                    value="{{ equipment[1] if edit else '' }}" required/>
+                </div>
+
+                <div class="form-group">
+                  <label>Category *</label>
+                  <select name="category" required>
+                    <option value="">Select category</option>
+                    <option value="Tractor"   {% if edit and equipment[2]=='Tractor' %}selected{% endif %}>🚜 Tractor</option>
+                    <option value="Harvester" {% if edit and equipment[2]=='Harvester' %}selected{% endif %}>🌾 Harvester</option>
+                    <option value="Attachment" {% if edit and equipment[2]=='Attachment' %}selected{% endif %}>⚙️ Attachment / Implement</option>
+                    <option value="Planting"  {% if edit and equipment[2]=='Planting' %}selected{% endif %}>🌱 Planting Equipment</option>
+                    <option value="Irrigation" {% if edit and equipment[2]=='Irrigation' %}selected{% endif %}>💧 Irrigation</option>
+                    <option value="Sprayer"   {% if edit and equipment[2]=='Sprayer' %}selected{% endif %}>💦 Sprayer</option>
+                    <option value="Other"     {% if edit and equipment[2]=='Other' %}selected{% endif %}>🔧 Other</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label>Price Per Day (₹) *</label>
+                  <input type="number" name="price_per_day"
+                    placeholder="e.g. 1200"
+                    value="{{ equipment[3] if edit else '' }}"
+                    min="1" required/>
+                </div>
+
+                <div class="form-group">
+                  <label>Horsepower (optional)</label>
+                  <input type="number" name="horsepower"
+                    placeholder="e.g. 50"
+                    value="{{ equipment[4] if edit else '' }}"/>
+                </div>
+
+                <div class="form-group">
+                  <label>Status</label>
+                  <select name="status">
+                    <option value="available"    {% if edit and equipment[5]=='available' %}selected{% endif %}>✅ Available</option>
+                    <option value="maintenance"  {% if edit and equipment[5]=='maintenance' %}selected{% endif %}>🔧 Under Maintenance</option>
+                  </select>
+                </div>
+
+                <div class="form-group full">
+                  <label>Description</label>
+                  <textarea name="description" placeholder="Describe condition, features, accessories included, etc.">{{ equipment[6] if edit else '' }}</textarea>
+                </div>
+
+              </div>
+            </div>
+          </div>
+
+          <!-- PHOTO & EMOJI -->
+          <div class="section-card anim d2">
+            <div class="sc-header">
+              <div class="sc-icon">📷</div>
+              <div>
+                <div class="sc-title">Photo & Icon</div>
+                <div class="sc-sub">Upload an image and pick an emoji icon</div>
+              </div>
+            </div>
+            <div class="sc-body">
+              <div class="form-grid">
+
+                <div class="form-group full">
+                  <label>Equipment Photo</label>
+                  <div class="file-input-wrap">
+                    <input type="file" name="image" accept="image/*" {% if not edit %}required{% endif %}/>
+                  </div>
+                  {% if edit and equipment[4] %}
+                    <div class="current-img-note">📁 Current: {{ equipment[4] }}</div>
+                  {% endif %}
+                </div>
+
+                <div class="form-group full">
+                  <label>Choose Emoji Icon</label>
+                  <div class="emoji-picker">
+                    <div class="emoji-opt {% if not edit or equipment[5]=='🚜' %}selected{% endif %}" onclick="selectEmoji(this,'🚜')">🚜</div>
+                    <div class="emoji-opt" onclick="selectEmoji(this,'🌾')">🌾</div>
+                    <div class="emoji-opt" onclick="selectEmoji(this,'⚙️')">⚙️</div>
+                    <div class="emoji-opt" onclick="selectEmoji(this,'🔧')">🔧</div>
+                    <div class="emoji-opt" onclick="selectEmoji(this,'💧')">💧</div>
+                    <div class="emoji-opt" onclick="selectEmoji(this,'🌱')">🌱</div>
+                    <div class="emoji-opt" onclick="selectEmoji(this,'🏗️')">🏗️</div>
+                    <div class="emoji-opt" onclick="selectEmoji(this,'🚛')">🚛</div>
+                  </div>
+                  <input type="hidden" name="emoji" id="emojiInput" value="{{ equipment[5] if edit else '🚜' }}"/>
+                </div>
+
+              </div>
+            </div>
+          </div>
+
+          <!-- SUBMIT ACTIONS -->
+          <div class="form-actions anim d3">
+            <button type="submit" class="btn-submit">
+              {{ '✏️ Update Equipment' if edit else '➕ Add Equipment' }}
+            </button>
+            <a href="{{ url_for('owner_dashboard') }}" class="btn-cancel">Cancel</a>
+          </div>
+
+        </div><!-- /left col -->
+
+        <!-- RIGHT COLUMN -->
+        <div>
+
+          <!-- MAP -->
+          <div class="map-section anim d1">
+            <div class="map-header">
+              <div class="sc-icon">📍</div>
+              <div>
+                <div class="sc-title">Equipment Location</div>
+                <div class="sc-sub">Click map to pin exact location</div>
+              </div>
+            </div>
+            <div id="map"></div>
+            <div class="map-hint">
+              📌 Your current location is auto-detected. Click anywhere on the map to change the pin.
+            </div>
+          </div>
+
+          <!-- TIPS -->
+          <div class="tips-card anim d2">
+            <div class="tips-title">💡 Listing Tips</div>
+
+            <div class="tip-item">
+              <div class="tip-icon">📸</div>
+              <div class="tip-text">
+                <strong>Good photos = more bookings</strong>
+                Upload a clear front-facing photo in daylight for best results.
+              </div>
+            </div>
+
+            <div class="tip-item">
+              <div class="tip-icon">💰</div>
+              <div class="tip-text">
+                <strong>Competitive pricing</strong>
+                Check nearby listings and price 10–15% lower when starting out.
+              </div>
+            </div>
+
+            <div class="tip-item">
+              <div class="tip-icon">📍</div>
+              <div class="tip-text">
+                <strong>Accurate location</strong>
+                Pin your exact village/farm location so farmers nearby can find you easily.
+              </div>
+            </div>
+
+            <div class="tip-item">
+              <div class="tip-icon">📝</div>
+              <div class="tip-text">
+                <strong>Write a good description</strong>
+                Mention the model year, condition, any included attachments and operating hours.
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /right col -->
+
+      </div><!-- /form-layout -->
+
+    </form>
+  </main>
+</div>
+
+<script>
+  /* ── Emoji picker ── */
+  function selectEmoji(el, emoji) {
+    document.querySelectorAll('.emoji-opt').forEach(e => e.classList.remove('selected'));
+    el.classList.add('selected');
+    document.getElementById('emojiInput').value = emoji;
+  }
+
+  /* ── Leaflet Map ── */
+  var map = L.map('map').setView([17.385, 78.486], 13);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+  let marker;
+
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(function(pos) {
+      const lat = pos.coords.latitude;
+      const lng = pos.coords.longitude;
+      map.setView([lat, lng], 15);
+      marker = L.marker([lat, lng]).addTo(map).bindPopup("You are here 📍").openPopup();
+      document.getElementById("lat").value = lat;
+      document.getElementById("lng").value = lng;
+    }, function() {
+      alert("Location access denied ❌");
+    });
+  }
+
+  map.on('click', function(e) {
+    const lat = e.latlng.lat;
+    const lng = e.latlng.lng;
+    if (marker) map.removeLayer(marker);
+    marker = L.marker([lat, lng]).addTo(map).bindPopup("Selected location 📍").openPopup();
+    document.getElementById("lat").value = lat;
+    document.getElementById("lng").value = lng;
+  });
+</script>
+</body>
+</html>
