@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Book Equipment – KissanEquipp</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+    :root{
+      --forest:#1B4332;--mid:#2D6A4F;--leaf:#52B788;--mint:#95D5B2;
+      --pale:#D8F3DC;--cream:#F8FBF6;--gold:#D4A017;--gold-light:#F5C842;
+      --text:#1A2E1A;--muted:#5A7A5A;--white:#FFFFFF;
+      --sidebar-w:260px;
+    }
+    html{scroll-behavior:smooth;}
+    body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--text);display:flex;min-height:100vh;}
+
+    /* ── SIDEBAR ── */
+    .sidebar{width:var(--sidebar-w);background:var(--forest);min-height:100vh;position:fixed;top:0;left:0;z-index:50;display:flex;flex-direction:column;}
+    .sidebar::before{content:'';position:absolute;inset:0;background-image:radial-gradient(circle,rgba(82,183,136,0.06) 1px,transparent 1px);background-size:22px 22px;pointer-events:none;}
+    .sidebar-logo{display:flex;align-items:center;gap:10px;padding:26px 22px 20px;border-bottom:1px solid rgba(82,183,136,0.15);text-decoration:none;}
+    .logo-icon{width:38px;height:38px;background:var(--leaf);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+    .logo-text{font-family:'Playfair Display',serif;font-size:1.2rem;color:var(--white);}
+    .logo-text span{color:var(--gold);}
+    .sidebar-user{padding:18px 22px;border-bottom:1px solid rgba(82,183,136,0.12);display:flex;align-items:center;gap:12px;}
+    .user-avatar{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--leaf),var(--mid));display:flex;align-items:center;justify-content:center;font-size:1.1rem;font-weight:700;color:var(--white);flex-shrink:0;border:2px solid rgba(82,183,136,0.4);}
+    .user-info .user-name{font-size:0.9rem;font-weight:700;color:var(--white);line-height:1.2;}
+    .user-info .user-role{font-size:0.72rem;color:var(--leaf);font-weight:600;letter-spacing:0.04em;text-transform:uppercase;}
+    .sidebar-nav{flex:1;padding:18px 14px;display:flex;flex-direction:column;gap:4px;position:relative;z-index:1;}
+    .nav-label{font-size:0.62rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.28);padding:10px 8px 6px;}
+    .nav-item{display:flex;align-items:center;gap:11px;padding:11px 14px;border-radius:10px;text-decoration:none;color:rgba(255,255,255,0.55);font-size:0.88rem;font-weight:500;transition:all 0.2s;}
+    .nav-item:hover{background:rgba(82,183,136,0.1);color:rgba(255,255,255,0.9);}
+    .nav-item.active{background:rgba(82,183,136,0.18);color:var(--white);font-weight:700;}
+    .nav-icon{font-size:1.15rem;width:22px;text-align:center;flex-shrink:0;}
+    .nav-badge{margin-left:auto;background:var(--gold);color:var(--forest);font-size:0.65rem;font-weight:800;padding:2px 7px;border-radius:100px;}
+    .sidebar-footer{padding:16px 14px;border-top:1px solid rgba(82,183,136,0.12);position:relative;z-index:1;}
+    .logout-btn{display:flex;align-items:center;gap:11px;padding:11px 14px;border-radius:10px;color:rgba(255,255,255,0.45);font-size:0.88rem;font-weight:500;text-decoration:none;transition:all 0.2s;}
+    .logout-btn:hover{background:rgba(255,80,80,0.12);color:#ff6b6b;}
+
+    /* ── MAIN ── */
+    .main{margin-left:var(--sidebar-w);flex:1;display:flex;flex-direction:column;min-height:100vh;}
+
+    /* TOPBAR */
+    .topbar{background:var(--white);border-bottom:1px solid rgba(27,67,50,0.08);padding:0 32px;height:64px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:40;box-shadow:0 2px 12px rgba(27,67,50,0.05);}
+    .page-title{font-family:'Playfair Display',serif;font-size:1.2rem;color:var(--forest);}
+    .page-sub{font-size:0.78rem;color:var(--muted);margin-left:4px;}
+    .back-btn{display:inline-flex;align-items:center;gap:7px;padding:8px 18px;border-radius:10px;border:1.5px solid rgba(27,67,50,0.12);background:transparent;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:0.82rem;font-weight:600;cursor:pointer;text-decoration:none;transition:all 0.2s;}
+    .back-btn:hover{background:var(--pale);color:var(--forest);border-color:var(--leaf);}
+
+    /* CONTENT */
+    .content{padding:28px 32px;flex:1;}
+    .content-grid{display:grid;grid-template-columns:1fr 320px;gap:24px;align-items:start;}
+
+    /* FLASH */
+    .flash-msg{padding:12px 20px;border-radius:10px;margin-bottom:20px;font-size:0.87rem;font-weight:600;display:flex;align-items:center;gap:10px;}
+    .flash-success{background:rgba(82,183,136,0.12);border:1px solid rgba(82,183,136,0.3);color:var(--mid);}
+    .flash-error{background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.25);color:#dc2626;}
+
+    /* EQUIPMENT HERO */
+    .equip-hero{background:linear-gradient(135deg,var(--forest) 0%,var(--mid) 100%);border-radius:20px;padding:24px 28px;margin-bottom:24px;position:relative;overflow:hidden;display:flex;align-items:center;gap:20px;}
+    .equip-hero::before{content:'';position:absolute;inset:0;background-image:radial-gradient(circle,rgba(82,183,136,0.08) 1px,transparent 1px);background-size:22px 22px;pointer-events:none;}
+    .equip-hero-emoji{width:72px;height:72px;border-radius:16px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;font-size:2.2rem;flex-shrink:0;position:relative;z-index:1;}
+    .equip-hero-info{flex:1;position:relative;z-index:1;}
+    .equip-hero-name{font-family:'Playfair Display',serif;font-size:1.4rem;color:var(--white);margin-bottom:4px;}
+    .equip-hero-sub{font-size:0.8rem;color:rgba(255,255,255,0.5);margin-bottom:12px;}
+    .equip-hero-tags{display:flex;gap:10px;flex-wrap:wrap;}
+    .hero-tag{display:inline-flex;align-items:center;gap:5px;padding:4px 12px;border-radius:100px;font-size:0.72rem;font-weight:700;}
+    .tag-gold{background:rgba(212,160,23,0.2);border:1px solid rgba(212,160,23,0.35);color:var(--gold-light);}
+    .tag-green{background:rgba(82,183,136,0.18);border:1px solid rgba(82,183,136,0.3);color:var(--mint);}
+    .tag-white{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.5);}
+    .avail-badge{position:absolute;top:20px;right:24px;background:rgba(82,183,136,0.2);border:1px solid rgba(82,183,136,0.35);color:var(--mint);border-radius:100px;padding:4px 14px;font-size:0.72rem;font-weight:700;z-index:1;}
+
+    /* SECTION CARD */
+    .section-card{background:var(--white);border-radius:18px;border:1px solid rgba(27,67,50,0.07);box-shadow:0 2px 12px rgba(27,67,50,0.05);overflow:hidden;margin-bottom:20px;}
+    .sc-header{padding:18px 24px;border-bottom:1px solid rgba(27,67,50,0.06);display:flex;align-items:center;gap:12px;}
+    .sc-icon{width:36px;height:36px;border-radius:10px;background:var(--pale);display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;}
+    .sc-title{font-size:0.95rem;font-weight:700;color:var(--forest);}
+    .sc-body{padding:22px 24px;}
+
+    /* FORM */
+    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;}
+    .form-row.single{grid-template-columns:1fr;margin-bottom:0;}
+    .form-row:last-child{margin-bottom:0;}
+    .form-group{display:flex;flex-direction:column;gap:7px;}
+    label{font-size:0.72rem;font-weight:700;color:var(--muted);letter-spacing:0.04em;text-transform:uppercase;}
+    label .req{color:#dc2626;}
+    input,select,textarea{font-family:'DM Sans',sans-serif;font-size:0.88rem;color:var(--text);background:var(--cream);border:1.5px solid rgba(27,67,50,0.12);border-radius:10px;padding:10px 14px;outline:none;transition:all 0.2s;width:100%;}
+    input:focus,select:focus,textarea:focus{border-color:var(--leaf);background:var(--white);box-shadow:0 0 0 3px rgba(82,183,136,0.1);}
+    input::placeholder,textarea::placeholder{color:var(--muted);}
+    textarea{resize:vertical;min-height:84px;}
+    select{cursor:pointer;}
+    select option{background:var(--white);}
+
+    /* DATE STRIP */
+    .date-strip{display:flex;align-items:center;justify-content:space-between;background:var(--pale);border-radius:12px;padding:14px 18px;margin-top:14px;}
+    .ds-box{text-align:center;}
+    .ds-label{font-size:0.65rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.07em;}
+    .ds-val{font-family:'Playfair Display',serif;font-size:1rem;color:var(--forest);margin-top:3px;}
+    .ds-arrow{color:var(--muted);font-size:1.1rem;}
+    .days-badge{background:var(--leaf);color:var(--white);font-size:0.72rem;font-weight:700;padding:5px 14px;border-radius:100px;}
+
+    /* COST CARD */
+    .cost-card{background:var(--white);border-radius:18px;border:1px solid rgba(27,67,50,0.07);box-shadow:0 2px 12px rgba(27,67,50,0.05);overflow:hidden;position:sticky;top:80px;}
+    .cc-head{padding:18px 24px;border-bottom:1px solid rgba(27,67,50,0.06);}
+    .cc-head-title{font-size:0.95rem;font-weight:700;color:var(--forest);}
+    .cc-head-sub{font-size:0.75rem;color:var(--muted);margin-top:3px;}
+    .cc-body{padding:20px 24px;}
+
+    .cc-equip-row{display:flex;align-items:center;gap:10px;padding:12px;background:var(--pale);border-radius:12px;margin-bottom:18px;}
+    .cc-eq-emoji{font-size:1.4rem;}
+    .cc-eq-name{font-size:0.85rem;font-weight:700;color:var(--forest);flex:1;}
+    .cc-eq-price{font-size:0.85rem;font-weight:700;color:var(--mid);}
+
+    .cc-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid rgba(27,67,50,0.06);}
+    .cc-row:last-of-type{border-bottom:none;}
+    .cc-label{font-size:0.8rem;color:var(--muted);}
+    .cc-val{font-size:0.85rem;font-weight:600;color:var(--text);}
+
+    .cc-total-wrap{background:linear-gradient(135deg,var(--forest),var(--mid));border-radius:14px;padding:16px 18px;margin:16px 0;}
+    .cc-total-row{display:flex;justify-content:space-between;align-items:center;}
+    .cc-total-label{font-size:0.85rem;font-weight:700;color:rgba(255,255,255,0.8);}
+    .cc-total-val{font-family:'Playfair Display',serif;font-size:1.5rem;color:var(--gold-light);font-weight:900;}
+
+    .submit-btn{width:100%;padding:14px;background:var(--leaf);color:var(--forest);border:none;border-radius:12px;font-family:'DM Sans',sans-serif;font-size:0.95rem;font-weight:700;cursor:pointer;transition:all 0.25s;display:flex;align-items:center;justify-content:center;gap:8px;}
+    .submit-btn:hover{background:var(--mint);transform:translateY(-1px);}
+    .submit-btn:active{transform:translateY(0);}
+    .cancel-link{display:block;text-align:center;margin-top:12px;font-size:0.78rem;color:var(--muted);text-decoration:none;}
+    .cancel-link:hover{color:var(--forest);}
+
+    .trust-grid{display:flex;flex-direction:column;gap:8px;margin-top:16px;}
+    .trust-item{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--cream);border:1px solid rgba(27,67,50,0.07);border-radius:10px;}
+    .trust-icon{font-size:1rem;flex-shrink:0;}
+    .trust-text{font-size:0.75rem;color:var(--muted);}
+    .trust-text strong{color:var(--forest);display:block;font-size:0.78rem;}
+
+    /* ANIMATIONS */
+    @keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+    .anim{animation:fadeUp 0.45s ease both;}
+    .d1{animation-delay:0.08s;}.d2{animation-delay:0.16s;}.d3{animation-delay:0.22s;}
+
+    @media(max-width:960px){.content-grid{grid-template-columns:1fr;}.cost-card{position:static;}}
+    @media(max-width:768px){.sidebar{display:none;}.main{margin-left:0;}.content{padding:20px 16px;}.form-row{grid-template-columns:1fr;}}
+  </style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <a href="{{ url_for('home') }}" class="sidebar-logo">
+    <div class="logo-icon">🌾</div>
+    <div class="logo-text">Kissan<span>Equipp</span></div>
+  </a>
+  <div class="sidebar-user">
+    <div class="user-avatar">{{ session['name'][0]|upper }}</div>
+    <div class="user-info">
+      <div class="user-name">{{ session['name'] }}</div>
+      <div class="user-role">🌱 Farmer</div>
+    </div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-label">Main Menu</div>
+    <a href="{{ url_for('farmer_dashboard') }}" class="nav-item">
+      <span class="nav-icon">🏠</span> Dashboard
+    </a>
+    <a href="{{ url_for('browse_equipment') }}" class="nav-item active">
+      <span class="nav-icon">🚜</span> Browse Equipment
+    </a>
+    <a href="{{ url_for('farmer_bookings') }}" class="nav-item">
+      <span class="nav-icon">📅</span> My Bookings
+    </a>
+    <div class="nav-label">Account</div>
+    <a href="{{ url_for('farmer_profile') }}" class="nav-item">
+      <span class="nav-icon">👤</span> My Profile
+    </a>
+  </nav>
+  <div class="sidebar-footer">
+    <a href="{{ url_for('logout') }}" class="logout-btn">
+      <span class="nav-icon">🚪</span> Logout
+    </a>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div style="display:flex;align-items:center;gap:8px;">
+      <span class="page-title">Book Equipment</span>
+      <span class="page-sub">/ Fill in the details to confirm your booking</span>
+    </div>
+    <a href="{{ url_for('browse_equipment') }}" class="back-btn">← Back to Browse</a>
+  </header>
+
+  <main class="content">
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}{% for category, message in messages %}
+        <div class="flash-msg flash-{{ category }}">{{ '✅' if category == 'success' else '⚠️' }} {{ message }}</div>
+      {% endfor %}{% endif %}
+    {% endwith %}
+
+    <!-- EQUIPMENT HERO -->
+    <div class="equip-hero anim">
+      <span class="avail-badge">✓ {{ 'Available' if equipment and equipment[5]==1 else 'Not Available' }}</span>
+      <div class="equip-hero-emoji">
+        {% if equipment %}
+          {% set n = equipment[1]|lower %}
+          {% if 'tractor' in n %}🚜{% elif 'harvest' in n %}🌾{% elif 'tiller' in n or 'rotat' in n %}⚙️{% elif 'spray' in n %}💧{% elif 'seed' in n %}🌱{% else %}🔧{% endif %}
+        {% else %}🚜{% endif %}
+      </div>
+      <div class="equip-hero-info">
+        <div class="equip-hero-name">{{ equipment[1] if equipment else 'Equipment' }}</div>
+        <div class="equip-hero-sub">{{ equipment[2] if equipment else '' }} · Listed by {{ equipment[6] if equipment and equipment|length > 6 else 'Owner' }}</div>
+        <div class="equip-hero-tags">
+          <span class="hero-tag tag-gold">💰 ₹{{ equipment[3] if equipment else '—' }} / day</span>
+          <span class="hero-tag tag-green">📍 {{ equipment[4] if equipment else '—' }}</span>
+          <span class="hero-tag tag-white">#{{ equipment[0] if equipment else '—' }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="content-grid">
+
+      <!-- LEFT -->
+      <div>
+        <form method="POST" action="{{ url_for('booking_page', equipment_id=equipment[0]) }}" id="bookingForm">
+
+          <!-- Your Details -->
+          <div class="section-card anim d1">
+            <div class="sc-header">
+              <div class="sc-icon">👤</div>
+              <div class="sc-title">Your Details</div>
+            </div>
+            <div class="sc-body">
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Full Name <span class="req">*</span></label>
+                  <input type="text" name="farmer_name" placeholder="e.g. Suresh Reddy" value="{{ session['name'] }}" required/>
+                </div>
+                <div class="form-group">
+                  <label>Mobile Number <span class="req">*</span></label>
+                  <input type="tel" name="farmer_phone" pattern="[0-9]{10}" placeholder="+91 98765 43210" required/>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Village / Town <span class="req">*</span></label>
+                  <input type="text" name="farmer_village" placeholder="e.g. Nalgonda" required/>
+                </div>
+                <div class="form-group">
+                  <label>District <span class="req">*</span></label>
+                  <select name="farmer_district" required>
+                    <option value="">Select district…</option>
+                    <option>Hyderabad</option><option>Rangareddy</option><option>Medak</option>
+                    <option>Nalgonda</option><option>Warangal</option><option>Karimnagar</option>
+                    <option>Nizamabad</option><option>Adilabad</option><option>Khammam</option>
+                    <option>Mahbubnagar</option><option>Suryapet</option><option>Yadadri</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-row single">
+                <div class="form-group">
+                  <label>Farm Address</label>
+                  <input type="text" name="farm_address" placeholder="Survey No., Village, Mandal…"/>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Booking Dates -->
+          <div class="section-card anim d2">
+            <div class="sc-header">
+              <div class="sc-icon">📅</div>
+              <div class="sc-title">Booking Dates</div>
+            </div>
+            <div class="sc-body">
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Start Date <span class="req">*</span></label>
+                  <input type="date" name="start_date" id="startDate" onchange="calcCost()" required/>
+                </div>
+                <div class="form-group">
+                  <label>End Date <span class="req">*</span></label>
+                  <input type="date" name="end_date" id="endDate" onchange="calcCost()" required/>
+                </div>
+              </div>
+              <div class="date-strip" id="dateStrip" style="display:none;">
+                <div class="ds-box">
+                  <div class="ds-label">From</div>
+                  <div class="ds-val" id="fromVal">—</div>
+                </div>
+                <div class="ds-arrow">→</div>
+                <div class="ds-box">
+                  <div class="ds-label">To</div>
+                  <div class="ds-val" id="toVal">—</div>
+                </div>
+                <div class="days-badge" id="daysBadge">1 day</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Farm & Crop Details -->
+          <div class="section-card anim d3">
+            <div class="sc-header">
+              <div class="sc-icon">🌾</div>
+              <div class="sc-title">Farm & Crop Details</div>
+            </div>
+            <div class="sc-body">
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Crop Type</label>
+                  <select name="crop_type">
+                    <option value="">Select crop…</option>
+                    <option>Rice / Paddy</option><option>Cotton</option><option>Sugarcane</option>
+                    <option>Maize / Corn</option><option>Soybean</option><option>Groundnut</option>
+                    <option>Turmeric</option><option>Chillies</option><option>Other</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>Land Area (acres)</label>
+                  <input type="number" name="land_acres" placeholder="e.g. 5" min="0.5" step="0.5"/>
+                </div>
+              </div>
+              <div class="form-row single">
+                <div class="form-group">
+                  <label>Special Instructions</label>
+                  <textarea name="special_note" placeholder="Field conditions, timing preferences, any special requirements…"></textarea>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </form>
+      </div>
+
+      <!-- RIGHT — Cost Summary -->
+      <div>
+        <div class="cost-card anim d1">
+          <div class="cc-head">
+            <div class="cc-head-title">💰 Cost Summary</div>
+            <div class="cc-head-sub">Estimated booking cost</div>
+          </div>
+          <div class="cc-body">
+
+            <div class="cc-equip-row">
+              <span class="cc-eq-emoji">
+                {% if equipment %}{% set n = equipment[1]|lower %}
+                {% if 'tractor' in n %}🚜{% elif 'harvest' in n %}🌾{% elif 'spray' in n %}💧{% elif 'seed' in n %}🌱{% else %}🔧{% endif %}
+                {% else %}🚜{% endif %}
+              </span>
+              <span class="cc-eq-name">{{ equipment[1] if equipment else '—' }}</span>
+              <span class="cc-eq-price">₹{{ equipment[3] if equipment else 0 }}/day</span>
+            </div>
+
+            <div class="cc-row">
+              <span class="cc-label">Number of days</span>
+              <span class="cc-val" id="ccDays">— days</span>
+            </div>
+            <div class="cc-row">
+              <span class="cc-label">Base amount</span>
+              <span class="cc-val" id="ccBase">—</span>
+            </div>
+            <div class="cc-row">
+              <span class="cc-label">Service fee (5%)</span>
+              <span class="cc-val" id="ccFee">—</span>
+            </div>
+
+            <div class="cc-total-wrap">
+              <div class="cc-total-row">
+                <span class="cc-total-label">Total Estimate</span>
+                <span class="cc-total-val" id="ccTotal">—</span>
+              </div>
+            </div>
+
+            <button type="submit" class="submit-btn" onclick="document.getElementById('bookingForm').submit()">
+              📅 Confirm Booking
+            </button>
+            <a class="cancel-link" href="{{ url_for('browse_equipment') }}">← Cancel &amp; go back</a>
+
+            <div class="trust-grid">
+              <div class="trust-item">
+                <span class="trust-icon">🔒</span>
+                <div class="trust-text"><strong>Secure Booking</strong>Your data is protected</div>
+              </div>
+              <div class="trust-item">
+                <span class="trust-icon">⚡</span>
+                <div class="trust-text"><strong>Instant Confirmation</strong>SMS within 5 minutes</div>
+              </div>
+              <div class="trust-item">
+                <span class="trust-icon">🤝</span>
+                <div class="trust-text"><strong>No Middlemen</strong>Direct contact with owner</div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<script>
+const RATE = {{ equipment[3] if equipment and equipment[3] else 0 }};
+
+function calcCost() {
+  const s = document.getElementById('startDate').value;
+  const e = document.getElementById('endDate').value;
+  if (!s || !e) return;
+  const start = new Date(s), end = new Date(e);
+  if (end < start) { document.getElementById('endDate').value = s; return; }
+  const days = Math.max(1, Math.floor((end - start) / 86400000) + 1);
+  const base = RATE * days;
+  const fee = Math.round(base * 0.05);
+  const total = base + fee;
+  const fmt = d => new Date(d).toLocaleDateString('en-IN', {day:'numeric', month:'short'});
+  document.getElementById('fromVal').textContent = fmt(s);
+  document.getElementById('toVal').textContent = fmt(e);
+  document.getElementById('daysBadge').textContent = days + (days === 1 ? ' day' : ' days');
+  document.getElementById('dateStrip').style.display = 'flex';
+  document.getElementById('ccDays').textContent = days + (days === 1 ? ' day' : ' days');
+  document.getElementById('ccBase').textContent = '₹' + base.toLocaleString('en-IN');
+  document.getElementById('ccFee').textContent = '₹' + fee.toLocaleString('en-IN');
+  document.getElementById('ccTotal').textContent = '₹' + total.toLocaleString('en-IN');
+}
+
+window.onload = function() {
+  const today = new Date();
+  const tomorrow = new Date(today);
+  tomorrow.setDate(today.getDate() + 1);
+  const toISO = d => d.toISOString().split('T')[0];
+  document.getElementById('startDate').min = toISO(today);
+  document.getElementById('endDate').min = toISO(today);
+  document.getElementById('startDate').value = toISO(today);
+  document.getElementById('endDate').value = toISO(tomorrow);
+  calcCost();
+};
+</script>
+</body>
+</html>
