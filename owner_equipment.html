@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>My Equipment – KissanEquipp</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+  *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+  :root{
+    --forest:#1B4332;--mid:#2D6A4F;--leaf:#52B788;--mint:#95D5B2;
+    --pale:#D8F3DC;--cream:#F8FBF6;--gold:#D4A017;--gold-light:#F5C842;
+    --text:#1A2E1A;--muted:#5A7A5A;--white:#FFFFFF;
+    --danger:#EF4444;--sidebar-w:260px;
+  }
+  html{scroll-behavior:smooth;}
+  body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--text);display:flex;min-height:100vh;overflow-x:hidden;}
+
+  /* ── SIDEBAR ── */
+  .sidebar{width:var(--sidebar-w);background:var(--forest);min-height:100vh;position:fixed;top:0;left:0;z-index:50;display:flex;flex-direction:column;transition:transform 0.3s;}
+  .sidebar::before{content:'';position:absolute;inset:0;background-image:radial-gradient(circle,rgba(82,183,136,0.06) 1px,transparent 1px);background-size:22px 22px;pointer-events:none;}
+
+  .sidebar-logo{display:flex;align-items:center;gap:10px;padding:26px 22px 20px;border-bottom:1px solid rgba(82,183,136,0.15);text-decoration:none;}
+  .logo-icon{width:38px;height:38px;background:var(--leaf);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+  .logo-text{font-family:'Playfair Display',serif;font-size:1.2rem;color:var(--white);}
+  .logo-text span{color:var(--gold);}
+
+  .sidebar-user{padding:18px 22px;border-bottom:1px solid rgba(82,183,136,0.12);display:flex;align-items:center;gap:12px;}
+  .user-avatar{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--leaf),var(--mid));display:flex;align-items:center;justify-content:center;font-size:1.1rem;font-weight:700;color:var(--white);flex-shrink:0;border:2px solid rgba(82,183,136,0.4);}
+  .user-info .user-name{font-size:0.9rem;font-weight:700;color:var(--white);line-height:1.2;}
+  .user-info .user-role{font-size:0.72rem;color:var(--leaf);font-weight:600;letter-spacing:0.04em;text-transform:uppercase;}
+
+  .sidebar-nav{flex:1;padding:18px 14px;display:flex;flex-direction:column;gap:4px;position:relative;z-index:1;}
+  .nav-label{font-size:0.62rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.28);padding:10px 8px 6px;}
+  .nav-item{display:flex;align-items:center;gap:11px;padding:11px 14px;border-radius:10px;text-decoration:none;color:rgba(255,255,255,0.55);font-size:0.88rem;font-weight:500;transition:all 0.2s;}
+  .nav-item:hover{background:rgba(82,183,136,0.1);color:rgba(255,255,255,0.9);}
+  .nav-item.active{background:rgba(82,183,136,0.18);color:var(--white);font-weight:700;}
+  .nav-icon{font-size:1.15rem;width:22px;text-align:center;flex-shrink:0;}
+
+  .sidebar-footer{padding:16px 14px;border-top:1px solid rgba(82,183,136,0.12);position:relative;z-index:1;}
+  .logout-btn{display:flex;align-items:center;gap:11px;padding:11px 14px;border-radius:10px;color:rgba(255,255,255,0.45);font-size:0.88rem;font-weight:500;text-decoration:none;transition:all 0.2s;}
+  .logout-btn:hover{background:rgba(255,80,80,0.12);color:#ff6b6b;}
+
+  /* ── MAIN ── */
+  .main{margin-left:var(--sidebar-w);flex:1;display:flex;flex-direction:column;min-height:100vh;}
+
+  /* TOP BAR */
+  .topbar{background:var(--white);border-bottom:1px solid rgba(27,67,50,0.08);padding:0 32px;height:64px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:40;box-shadow:0 2px 12px rgba(27,67,50,0.05);}
+  .topbar-left{display:flex;align-items:center;gap:14px;}
+  .page-title{font-family:'Playfair Display',serif;font-size:1.2rem;color:var(--forest);}
+  .topbar-right{display:flex;align-items:center;gap:10px;}
+  .btn-add{display:inline-flex;align-items:center;gap:7px;padding:9px 18px;background:var(--leaf);color:var(--forest);border:none;border-radius:10px;font-size:0.84rem;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.2s;text-decoration:none;}
+  .btn-add:hover{background:var(--mint);}
+
+  /* CONTENT */
+  .content{padding:28px 32px;flex:1;}
+
+  /* PAGE BANNER */
+  .page-banner{background:linear-gradient(135deg,var(--forest) 0%,var(--mid) 100%);border-radius:20px;padding:26px 32px;margin-bottom:28px;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:space-between;}
+  .page-banner::before{content:'';position:absolute;inset:0;background-image:radial-gradient(circle,rgba(82,183,136,0.08) 1px,transparent 1px);background-size:22px 22px;pointer-events:none;}
+  .banner-text{position:relative;z-index:1;}
+  .banner-label{font-size:0.78rem;color:var(--mint);font-weight:600;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:4px;}
+  .banner-text h1{font-family:'Playfair Display',serif;font-size:1.6rem;color:var(--white);margin-bottom:5px;}
+  .banner-text p{font-size:0.85rem;color:rgba(255,255,255,0.5);max-width:420px;}
+  .banner-art{font-size:4.5rem;opacity:0.15;position:absolute;right:32px;top:50%;transform:translateY(-50%);line-height:1;}
+
+  /* STATS */
+  .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px;}
+  .stat-card{background:var(--white);border-radius:16px;padding:20px;border:1px solid rgba(27,67,50,0.07);box-shadow:0 2px 12px rgba(27,67,50,0.05);transition:all 0.3s;position:relative;overflow:hidden;}
+  .stat-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;}
+  .stat-card.s1::after{background:var(--leaf);}
+  .stat-card.s2::after{background:#22c55e;}
+  .stat-card.s3::after{background:var(--gold);}
+  .stat-card.s4::after{background:#3B82F6;}
+  .stat-card:hover{transform:translateY(-3px);box-shadow:0 8px 28px rgba(27,67,50,0.1);}
+  .stat-icon{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;margin-bottom:12px;}
+  .ic-green{background:var(--pale);}
+  .ic-lime{background:rgba(34,197,94,0.1);}
+  .ic-gold{background:rgba(212,160,23,0.12);}
+  .ic-blue{background:rgba(59,130,246,0.1);}
+  .stat-val{font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:900;color:var(--forest);line-height:1;}
+  .stat-val.green{color:#22c55e;}
+  .stat-val.gold{color:var(--gold);}
+  .stat-val.blue{color:#3B82F6;}
+  .stat-lbl{font-size:0.77rem;color:var(--muted);margin-top:4px;font-weight:500;}
+  .stat-sub{font-size:0.71rem;color:var(--muted);margin-top:5px;}
+
+  /* TOOLBAR */
+  .toolbar{display:flex;align-items:center;gap:10px;margin-bottom:20px;flex-wrap:wrap;}
+  .search-wrap{position:relative;flex:1;min-width:220px;max-width:320px;}
+  .search-wrap input{width:100%;background:var(--white);border:1.5px solid rgba(27,67,50,0.1);border-radius:10px;padding:9px 14px 9px 38px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:0.87rem;outline:none;transition:border 0.2s;}
+  .search-wrap input:focus{border-color:var(--leaf);}
+  .search-wrap .sicon{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:0.9rem;pointer-events:none;color:var(--muted);}
+  .toolbar-right{margin-left:auto;display:flex;align-items:center;gap:10px;}
+  .result-count{font-size:0.82rem;color:var(--muted);font-weight:500;}
+  .view-toggle{display:flex;background:var(--white);border:1.5px solid rgba(27,67,50,0.1);border-radius:10px;overflow:hidden;}
+  .view-btn{padding:8px 14px;border:none;background:transparent;color:var(--muted);cursor:pointer;font-size:1rem;transition:all 0.2s;font-family:'DM Sans',sans-serif;}
+  .view-btn.active{background:var(--forest);color:var(--white);}
+
+  /* ── GRID VIEW ── */
+  .equip-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:18px;}
+  .equip-card{background:var(--white);border-radius:16px;border:1px solid rgba(27,67,50,0.08);box-shadow:0 2px 12px rgba(27,67,50,0.05);overflow:hidden;transition:all 0.3s;animation:fadeUp 0.4s ease both;}
+  .equip-card:hover{transform:translateY(-4px);box-shadow:0 12px 32px rgba(27,67,50,0.12);border-color:var(--leaf);}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
+  .equip-card:nth-child(1){animation-delay:.05s}.equip-card:nth-child(2){animation-delay:.10s}
+  .equip-card:nth-child(3){animation-delay:.15s}.equip-card:nth-child(4){animation-delay:.20s}
+  .equip-card:nth-child(5){animation-delay:.25s}.equip-card:nth-child(6){animation-delay:.30s}
+
+  .card-thumb{height:130px;background:linear-gradient(135deg,var(--pale),var(--mint));display:flex;align-items:center;justify-content:center;font-size:3.5rem;position:relative;overflow:hidden;}
+  .card-thumb img{width:100%;height:100%;object-fit:cover;}
+  .card-status-badge{position:absolute;top:10px;right:10px;padding:4px 10px;border-radius:100px;font-size:0.65rem;font-weight:800;text-transform:uppercase;letter-spacing:0.04em;}
+  .badge-available{background:rgba(82,183,136,0.15);color:var(--mid);border:1px solid rgba(82,183,136,0.3);}
+  .badge-maintenance{background:rgba(212,160,23,0.15);color:#9a6e00;border:1px solid rgba(212,160,23,0.3);}
+  .badge-rented{background:rgba(59,130,246,0.12);color:#2563eb;border:1px solid rgba(59,130,246,0.25);}
+
+  .card-body{padding:16px;}
+  .card-name{font-size:0.95rem;font-weight:700;color:var(--forest);margin-bottom:3px;}
+  .card-cat{font-size:0.75rem;color:var(--muted);margin-bottom:12px;}
+  .card-meta{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+  .card-price{font-size:1rem;font-weight:700;color:var(--mid);}
+  .card-price span{font-size:0.7rem;font-weight:400;color:var(--muted);}
+  .card-loc{font-size:0.75rem;color:var(--muted);display:flex;align-items:center;gap:3px;}
+  .card-actions{display:flex;gap:8px;padding-top:12px;border-top:1px solid rgba(27,67,50,0.07);}
+  .card-btn{flex:1;padding:8px;border-radius:9px;border:1.5px solid rgba(27,67,50,0.1);background:var(--cream);color:var(--muted);font-size:0.78rem;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.2s;text-align:center;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:5px;}
+  .card-btn:hover{background:var(--pale);color:var(--forest);border-color:var(--leaf);}
+  .card-btn.danger:hover{background:rgba(239,68,68,0.08);color:var(--danger);border-color:var(--danger);}
+
+  /* ── TABLE VIEW ── */
+  .table-wrap{background:var(--white);border-radius:18px;border:1px solid rgba(27,67,50,0.07);box-shadow:0 2px 12px rgba(27,67,50,0.05);overflow:hidden;display:none;}
+  .table-top{padding:18px 24px;border-bottom:1px solid rgba(27,67,50,0.06);display:flex;align-items:center;justify-content:space-between;}
+  .table-top-title{font-size:0.95rem;font-weight:700;color:var(--forest);}
+  .table-top-count{font-size:0.78rem;color:var(--muted);}
+
+  table{width:100%;border-collapse:collapse;}
+  thead th{padding:11px 20px;text-align:left;font-size:0.68rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;background:var(--cream);border-bottom:1px solid rgba(27,67,50,0.06);}
+  tbody tr{border-bottom:1px solid rgba(27,67,50,0.05);transition:background 0.15s;animation:fadeUp 0.35s ease both;}
+  tbody tr:last-child{border-bottom:none;}
+  tbody tr:hover{background:var(--cream);}
+  tbody tr:nth-child(1){animation-delay:.04s}tbody tr:nth-child(2){animation-delay:.08s}
+  tbody tr:nth-child(3){animation-delay:.12s}tbody tr:nth-child(4){animation-delay:.16s}
+  td{padding:13px 20px;font-size:0.86rem;vertical-align:middle;}
+
+  .equip-cell{display:flex;align-items:center;gap:10px;}
+  .equip-emoji-box{width:40px;height:40px;border-radius:10px;background:var(--pale);display:flex;align-items:center;justify-content:center;font-size:1.3rem;border:1px solid rgba(27,67,50,0.07);flex-shrink:0;overflow:hidden;}
+  .equip-emoji-box img{width:100%;height:100%;object-fit:cover;}
+  .equip-name-txt{font-weight:700;font-size:0.88rem;color:var(--forest);}
+  .equip-id-txt{font-size:0.72rem;color:var(--muted);}
+  .price-txt{font-weight:700;color:var(--mid);font-size:0.9rem;}
+  .loc-txt{font-size:0.82rem;color:var(--muted);}
+
+  .status-pill{display:inline-flex;align-items:center;gap:5px;padding:4px 11px;border-radius:100px;font-size:0.65rem;font-weight:800;letter-spacing:0.04em;text-transform:uppercase;}
+  .status-pill::before{content:'';width:6px;height:6px;border-radius:50%;}
+  .sp-available{background:rgba(82,183,136,0.12);color:var(--mid);}
+  .sp-available::before{background:var(--leaf);}
+  .sp-maintenance{background:rgba(212,160,23,0.12);color:#9a6e00;}
+  .sp-maintenance::before{background:var(--gold);}
+  .sp-rented{background:rgba(59,130,246,0.1);color:#2563eb;}
+  .sp-rented::before{background:#3B82F6;}
+
+  .action-btns{display:flex;gap:6px;}
+  .icon-btn{width:32px;height:32px;border-radius:8px;border:1.5px solid rgba(27,67,50,0.1);background:var(--cream);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:0.85rem;transition:all 0.2s;text-decoration:none;}
+  .icon-btn:hover{border-color:var(--leaf);background:var(--pale);}
+  .icon-btn.del:hover{border-color:var(--danger);background:rgba(239,68,68,0.07);}
+
+  /* EMPTY STATE */
+  .empty-state{padding:56px 20px;text-align:center;color:var(--muted);}
+  .empty-icon{font-size:3rem;margin-bottom:12px;opacity:0.35;}
+  .empty-title{font-size:1rem;font-weight:700;margin-bottom:4px;}
+  .empty-sub{font-size:0.82rem;opacity:0.7;}
+
+  /* FLASH */
+  .flash-msg{padding:12px 20px;border-radius:10px;margin-bottom:20px;font-size:0.87rem;font-weight:600;display:flex;align-items:center;gap:10px;}
+  .flash-success{background:rgba(82,183,136,0.12);border:1px solid rgba(82,183,136,0.3);color:var(--mid);}
+  .flash-error{background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.25);color:#dc2626;}
+
+  /* ANIMATIONS */
+  @keyframes fadeUp{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
+  .anim{animation:fadeUp 0.45s ease both;}
+  .d1{animation-delay:.06s}.d2{animation-delay:.12s}.d3{animation-delay:.18s}.d4{animation-delay:.24s}
+
+  @media(max-width:1100px){.stats-grid{grid-template-columns:1fr 1fr;}}
+  @media(max-width:768px){.sidebar{transform:translateX(-100%);}.main{margin-left:0;}.content{padding:20px 16px;}.topbar{padding:0 16px;}}
+</style>
+</head>
+<body>
+
+<!-- ══ SIDEBAR ══════════════════════════════════════════════════ -->
+<aside class="sidebar">
+  <a href="{{ url_for('home') }}" class="sidebar-logo">
+    <div class="logo-icon">🌾</div>
+    <div class="logo-text">Kissan<span>Equipp</span></div>
+  </a>
+
+  <div class="sidebar-user">
+    <div class="user-avatar">{{ name[0]|upper if name else 'U' }}</div>
+    <div class="user-info">
+      <div class="user-name">{{ name }}</div>
+      <div class="user-role">🔧 Equipment Owner</div>
+    </div>
+  </div>
+
+  <nav class="sidebar-nav">
+    <div class="nav-label">Main Menu</div>
+    <a href="{{ url_for('owner_dashboard') }}" class="nav-item">
+      <span class="nav-icon">🏠</span> Dashboard
+    </a>
+    <a href="{{ url_for('my_equipment') }}" class="nav-item active">
+      <span class="nav-icon">🚜</span> My Equipment
+    </a>
+    <a href="{{ url_for('add_equipment') }}" class="nav-item">
+      <span class="nav-icon">➕</span> Add Equipment
+    </a>
+
+    <div class="nav-label">Rentals</div>
+    <a href="{{ url_for('owner_bookings') }}" class="nav-item">
+      <span class="nav-icon">📋</span> Bookings
+    </a>
+
+    <div class="nav-label">Finance</div>
+    <a href="{{ url_for('earnings') }}" class="nav-item">
+      <span class="nav-icon">💰</span> Earnings
+    </a>
+  </nav>
+
+  <div class="sidebar-footer">
+    <a href="{{ url_for('logout') }}" class="logout-btn">
+      <span class="nav-icon">🚪</span> Logout
+    </a>
+  </div>
+</aside>
+
+<!-- ══ MAIN ══════════════════════════════════════════════════════ -->
+<div class="main">
+
+  <!-- TOP BAR -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <span class="page-title">My Equipment</span>
+    </div>
+    <div class="topbar-right">
+      <a href="{{ url_for('add_equipment') }}" class="btn-add">➕ Add Equipment</a>
+    </div>
+  </header>
+
+  <!-- CONTENT -->
+  <main class="content">
+
+    <!-- Flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="flash-msg flash-{{ category }}">
+            {{ '✅' if category == 'success' else '⚠️' }} {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <!-- PAGE BANNER -->
+    <div class="page-banner anim">
+      <div class="banner-text">
+        <div class="banner-label">Your Fleet 🚜</div>
+        <h1>Manage Your Equipment</h1>
+        <p>View, edit and track all your listed machinery in one place.</p>
+      </div>
+      <div class="banner-art">⚙️</div>
+    </div>
+
+    <!-- STATS -->
+    <div class="stats-grid">
+      <div class="stat-card s1 anim d1">
+        <div class="stat-icon ic-green">🚜</div>
+        <div class="stat-val">{{ equipment|length }}</div>
+        <div class="stat-lbl">Total Listed</div>
+        <div class="stat-sub">Pieces of equipment</div>
+      </div>
+      <div class="stat-card s2 anim d2">
+        <div class="stat-icon ic-lime">✅</div>
+        <div class="stat-val green">
+          {{ equipment|selectattr(4,'equalto','available')|list|length if equipment[0] is defined and equipment[0]|length > 4 else equipment|length }}
+        </div>
+        <div class="stat-lbl">Available</div>
+        <div class="stat-sub">Ready to rent</div>
+      </div>
+      <div class="stat-card s3 anim d3">
+        <div class="stat-icon ic-gold">🔧</div>
+        <div class="stat-val gold">
+          {{ equipment|selectattr(4,'equalto','maintenance')|list|length if equipment[0] is defined and equipment[0]|length > 4 else 0 }}
+        </div>
+        <div class="stat-lbl">Under Maintenance</div>
+        <div class="stat-sub">Not rentable</div>
+      </div>
+      <div class="stat-card s4 anim d4">
+        <div class="stat-icon ic-blue">💰</div>
+        <div class="stat-val blue">
+          ₹{{ (equipment|selectattr(3)|map(attribute=3)|sum) // (equipment|length) if equipment|length > 0 else 0 }}
+        </div>
+        <div class="stat-lbl">Avg. Price / Day</div>
+        <div class="stat-sub">Across all equipment</div>
+      </div>
+    </div>
+
+    <!-- TOOLBAR -->
+    <div class="toolbar anim">
+      <div class="search-wrap">
+        <span class="sicon">🔍</span>
+        <input type="text" id="searchInput" placeholder="Search equipment or location…" oninput="applySearch()"/>
+      </div>
+      <div class="toolbar-right">
+        <span class="result-count" id="resultCount">{{ equipment|length }} items</span>
+        <div class="view-toggle">
+          <button class="view-btn active" id="gridBtn" onclick="setView('grid')" title="Grid view">⊞</button>
+          <button class="view-btn" id="listBtn" onclick="setView('list')" title="Table view">☰</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- GRID VIEW -->
+    <div class="equip-grid" id="gridView">
+      {% for e in equipment %}
+      <div class="equip-card" data-name="{{ e[1]|lower }}" data-loc="{{ e[3]|lower }}">
+        <div class="card-thumb">
+          {% if e[4] %}
+            <img src="{{ url_for('static', filename='uploads/' ~ e[4]) }}" alt="{{ e[1] }}"/>
+          {% else %}
+            {% if 'tractor' in e[1]|lower %}🚜
+            {% elif 'harvest' in e[1]|lower %}🌾
+            {% elif 'tiller' in e[1]|lower or 'rotat' in e[1]|lower %}⚙️
+            {% elif 'spray' in e[1]|lower %}💧
+            {% else %}🔧{% endif %}
+          {% endif %}
+          {% set st = e[7]|lower if e|length > 7 else 'available' %}
+          <span class="card-status-badge badge-{{ st }}">{{ st }}</span>
+        </div>
+        <div class="card-body">
+          <div class="card-name">{{ e[1] }}</div>
+          <div class="card-cat">{{ e[6] if e|length > 6 else 'Equipment' }} · ID #{{ e[0] }}</div>
+          <div class="card-meta">
+            <div class="card-price">₹{{ e[2] }}<span>/day</span></div>
+            <div class="card-loc">📍 {{ e[3] }}</div>
+          </div>
+          <div class="card-actions">
+            <a href="{{ url_for('edit_equipment', id=e[0]) }}" class="card-btn">✏️ Edit</a>
+            <form action="{{ url_for('delete_equipment', id=e[0]) }}" method="POST" style="flex:1;display:flex;">
+              <button type="submit" class="card-btn danger" style="width:100%;"
+                onclick="return confirm('Are you sure you want to delete this equipment?')">
+                🗑️ Delete
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+      {% else %}
+      <div class="empty-state" style="grid-column:1/-1">
+        <div class="empty-icon">🚜</div>
+        <div class="empty-title">No equipment listed yet</div>
+        <div class="empty-sub">Add your first machine to start getting rental requests</div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <!-- TABLE VIEW -->
+    <div class="table-wrap" id="listView">
+      <div class="table-top">
+        <span class="table-top-title">Equipment List</span>
+        <span class="table-top-count" id="tableCount">{{ equipment|length }} items</span>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Equipment</th>
+            <th>Price / Day</th>
+            <th>Location</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody">
+          {% for e in equipment %}
+          <tr data-name="{{ e[1]|lower }}" data-loc="{{ e[3]|lower }}">
+            <td><span style="font-size:0.78rem;color:var(--muted);">#{{ e[0] }}</span></td>
+            <td>
+              <div class="equip-cell">
+                <div class="equip-emoji-box">
+                  {% if e[4] %}
+                    <img src="{{ url_for('static', filename='uploads/' ~ e[4]) }}" alt=""/>
+                  {% else %}
+                    {% if 'tractor' in e[1]|lower %}🚜
+                    {% elif 'harvest' in e[1]|lower %}🌾
+                    {% elif 'tiller' in e[1]|lower %}⚙️
+                    {% elif 'spray' in e[1]|lower %}💧
+                    {% else %}🔧{% endif %}
+                  {% endif %}
+                </div>
+                <div>
+                  <div class="equip-name-txt">{{ e[1] }}</div>
+                  <div class="equip-id-txt">{{ e[6] if e|length > 6 else 'Equipment' }}</div>
+                </div>
+              </div>
+            </td>
+            <td><span class="price-txt">₹{{ e[2] }}<span style="font-size:0.72rem;color:var(--muted);font-weight:400;">/day</span></span></td>
+            <td><span class="loc-txt">📍 {{ e[3] }}</span></td>
+            <td>
+              {% set st = e[7]|lower if e|length > 7 else 'available' %}
+              <span class="status-pill sp-{{ st }}">{{ st }}</span>
+            </td>
+            <td>
+              <div class="action-btns">
+                <a href="{{ url_for('edit_equipment', id=e[0]) }}" class="icon-btn" title="Edit">✏️</a>
+                <form action="{{ url_for('delete_equipment', id=e[0]) }}" method="POST" style="display:inline;">
+                  <button type="submit" class="icon-btn del" title="Delete"
+                    onclick="return confirm('Delete this item?')">🗑️</button>
+                </form>
+              </div>
+            </td>
+          </tr>
+          {% else %}
+          <tr><td colspan="6">
+            <div class="empty-state">
+              <div class="empty-icon">🚜</div>
+              <div class="empty-title">No equipment found</div>
+            </div>
+          </td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+  </main>
+</div>
+
+<script>
+  let currentView = 'grid';
+
+  function setView(v) {
+    currentView = v;
+    document.getElementById('gridView').style.display = v === 'grid' ? 'grid' : 'none';
+    document.getElementById('listView').style.display = v === 'list' ? 'block' : 'none';
+    document.getElementById('gridBtn').classList.toggle('active', v === 'grid');
+    document.getElementById('listBtn').classList.toggle('active', v === 'list');
+  }
+
+  function applySearch() {
+    const q = document.getElementById('searchInput').value.toLowerCase();
+
+    const cards = document.querySelectorAll('.equip-card[data-name]');
+    let gvis = 0;
+    cards.forEach(c => {
+      const match = !q || c.dataset.name.includes(q) || c.dataset.loc.includes(q);
+      c.style.display = match ? '' : 'none';
+      if (match) gvis++;
+    });
+
+    const rows = document.querySelectorAll('#tableBody tr[data-name]');
+    let tvis = 0;
+    rows.forEach(r => {
+      const match = !q || r.dataset.name.includes(q) || r.dataset.loc.includes(q);
+      r.style.display = match ? '' : 'none';
+      if (match) tvis++;
+    });
+
+    const rc = document.getElementById('resultCount');
+    const tc = document.getElementById('tableCount');
+    if (rc) rc.textContent = (currentView === 'grid' ? gvis : tvis) + ' items';
+    if (tc) tc.textContent = tvis + ' items';
+  }
+</script>
+</body>
+</html>
