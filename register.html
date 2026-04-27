@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Register – KissanEquipp</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+    :root{
+      --forest:#1B4332;--mid:#2D6A4F;--leaf:#52B788;--mint:#95D5B2;
+      --pale:#D8F3DC;--cream:#F8FBF6;--gold:#D4A017;
+      --text:#1A2E1A;--muted:#5A7A5A;--white:#FFFFFF;
+    }
+    html{scroll-behavior:smooth;}
+    body{font-family:'DM Sans',sans-serif;background:var(--forest);color:var(--text);min-height:100vh;overflow-x:hidden;}
+    body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(circle,rgba(82,183,136,0.07) 1px,transparent 1px);background-size:26px 26px;pointer-events:none;z-index:0;}
+
+    /* NAV */
+    nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 6%;height:66px;background:rgba(27,67,50,0.97);backdrop-filter:blur(14px);border-bottom:1px solid rgba(82,183,136,0.18);}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none;}
+    .logo-icon{width:36px;height:36px;background:var(--leaf);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:19px;}
+    .logo-text{font-family:'Playfair Display',serif;font-size:1.3rem;color:var(--white);}
+    .logo-text span{color:var(--gold);}
+    .nav-back{color:rgba(255,255,255,0.65);font-size:0.85rem;text-decoration:none;display:flex;align-items:center;gap:6px;transition:color 0.2s;}
+    .nav-back:hover{color:var(--mint);}
+
+    /* MAIN LAYOUT */
+    .page-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:90px 20px 40px;position:relative;z-index:1;}
+
+    /* ROLE TOGGLE */
+    .card{background:rgba(255,255,255,0.04);border:1.5px solid rgba(82,183,136,0.2);border-radius:24px;padding:42px 44px;width:100%;max-width:500px;backdrop-filter:blur(20px);animation:fadeUp 0.55s ease both;}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(24px);}to{opacity:1;transform:translateY(0);}}
+
+    .card-header{text-align:center;margin-bottom:28px;}
+    .card-title{font-family:'Playfair Display',serif;font-size:1.85rem;color:var(--white);margin-bottom:6px;}
+    .card-sub{font-size:0.84rem;color:rgba(255,255,255,0.48);}
+
+    /* ROLE TABS */
+    .role-toggle{display:flex;background:rgba(0,0,0,0.25);border-radius:12px;padding:5px;margin-bottom:30px;gap:4px;}
+    .role-tab{flex:1;padding:11px 16px;border-radius:9px;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:0.88rem;font-weight:700;transition:all 0.25s;display:flex;align-items:center;justify-content:center;gap:7px;color:rgba(255,255,255,0.45);background:transparent;}
+    .role-tab.active-farmer{background:var(--leaf);color:var(--forest);}
+    .role-tab.active-owner{background:var(--gold);color:var(--forest);}
+    .role-tab:hover:not(.active-farmer):not(.active-owner){color:rgba(255,255,255,0.75);background:rgba(255,255,255,0.06);}
+
+    /* FORM */
+    .form-section{display:none;}
+    .form-section.active{display:block;}
+
+    .form-group{margin-bottom:18px;}
+    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+    label{display:block;font-size:0.76rem;font-weight:700;color:rgba(255,255,255,0.55);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:6px;}
+    input,select{width:100%;padding:12px 16px;background:rgba(255,255,255,0.06);border:1.5px solid rgba(82,183,136,0.2);border-radius:10px;color:var(--white);font-family:'DM Sans',sans-serif;font-size:0.9rem;outline:none;transition:all 0.2s;-webkit-appearance:none;}
+    input::placeholder{color:rgba(255,255,255,0.25);}
+    input:focus,select:focus{border-color:var(--leaf);background:rgba(82,183,136,0.08);}
+    select option{background:#1B4332;color:var(--white);}
+
+    /* Owner-specific accent */
+    .owner-mode input:focus,
+    .owner-mode select:focus{border-color:var(--gold);background:rgba(212,160,23,0.08);}
+
+    .divider{display:flex;align-items:center;gap:12px;margin:22px 0;color:rgba(255,255,255,0.25);font-size:0.78rem;}
+    .divider::before,.divider::after{content:'';flex:1;height:1px;background:rgba(255,255,255,0.1);}
+
+    .btn-submit{width:100%;padding:14px;border:none;border-radius:11px;font-family:'DM Sans',sans-serif;font-size:0.97rem;font-weight:700;cursor:pointer;transition:all 0.25s;margin-top:6px;}
+    .btn-farmer{background:var(--leaf);color:var(--forest);}
+    .btn-farmer:hover{background:var(--mint);transform:translateY(-2px);box-shadow:0 10px 28px rgba(82,183,136,0.3);}
+    .btn-owner{background:var(--gold);color:var(--forest);}
+    .btn-owner:hover{background:#e8b520;transform:translateY(-2px);box-shadow:0 10px 28px rgba(212,160,23,0.3);}
+
+    .login-link{text-align:center;margin-top:20px;font-size:0.84rem;color:rgba(255,255,255,0.42);}
+    .login-link a{color:var(--leaf);text-decoration:none;font-weight:600;}
+    .login-link a:hover{color:var(--mint);}
+    .owner-mode .login-link a{color:var(--gold);}
+
+    .badge-row{display:flex;gap:8px;margin-top:26px;justify-content:center;flex-wrap:wrap;}
+    .badge{display:flex;align-items:center;gap:5px;font-size:0.71rem;color:rgba(255,255,255,0.35);background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:100px;padding:5px 12px;}
+
+    /* Password toggle */
+    .pass-wrap{position:relative;}
+    .pass-toggle{position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:rgba(255,255,255,0.35);font-size:0.88rem;padding:0;transition:color 0.2s;}
+    .pass-toggle:hover{color:rgba(255,255,255,0.7);}
+
+    .role-indicator{display:inline-flex;align-items:center;gap:6px;font-size:0.75rem;font-weight:700;padding:4px 12px;border-radius:100px;margin-bottom:14px;}
+    .ri-farmer{background:rgba(82,183,136,0.15);color:var(--leaf);}
+    .ri-owner{background:rgba(212,160,23,0.15);color:var(--gold);}
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="" class="logo">
+    <div class="logo-icon">🌾</div>
+    <div class="logo-text">Kissan<span>Equipp</span></div>
+  </a>
+  <a href="/" class="nav-back">← Back to Home</a>
+</nav>
+
+<div class="page-wrap">
+  <div class="card" id="mainCard">
+
+    <div class="card-header">
+      <div class="card-title">Create Account</div>
+      <div class="card-sub">Join thousands of farmers and equipment owners</div>
+    </div>
+
+    <!-- ROLE TOGGLE -->
+    <div class="role-toggle">
+      <button class="role-tab" id="tab-farmer" onclick="switchRole('farmer')">👨‍🌾 I'm a Farmer</button>
+      <button class="role-tab" id="tab-owner" onclick="switchRole('owner')">🚜 I'm an Owner</button>
+    </div>
+
+    <!-- FARMER FORM -->
+    <div class="form-section" id="form-farmer">
+     <form method="POST" action="/register">
+      <input type="hidden" name="role" value="farmer">
+      <div class="role-indicator ri-farmer">👨‍🌾 Farmer Registration</div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>First Name</label>
+<input type="text" name="name" placeholder="Ramaiah" required/>
+        </div>
+        <div class="form-group">
+          <label>Last Name</label>
+            <input type="text" name="lastname" placeholder="Goud" required/>
+
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Mobile Number</label>
+        <input type="tel" name="mobile" placeholder="9876543210" maxlength="10" required>
+      </div>
+      <div class="form-group">
+        <label>Village / Town</label>
+        <input type="text" name="village" placeholder="e.g. Nalgonda"/>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>District</label>
+          <input type="text" name="district" placeholder="e.g. Nalgonda"/>
+        </div>
+        <div class="form-group">
+          <label>State</label>
+          <select name="state">
+            <option value="" disabled selected>Select state</option>
+            <option>Telangana</option>
+            <option>Andhra Pradesh</option>
+            <option>Karnataka</option>
+            <option>Maharashtra</option>
+            <option>Tamil Nadu</option>
+            <option>Other</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Land Holding (Acres)</label>
+        <input type="number" name="land_acres" placeholder="e.g. 3" required/>
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <div class="pass-wrap">
+          <input type="password" name="password" id="fp" placeholder="Create a strong password" required/>
+        </div>
+      </div>
+      <button class="btn-submit btn-farmer" type="submit">Register as Farmer →</button>
+    </form>
+    </div>
+
+    <!-- OWNER FORM -->
+<div class="form-section" id="form-owner">
+
+<form method="POST" action="/register">
+
+<input type="hidden" name="role" value="owner">
+
+<div class="role-indicator ri-owner">
+🚜 Equipment Owner Registration
+</div>
+
+<div class="form-row">
+
+<div class="form-group">
+<label>First Name</label>
+<input type="text" name="name" placeholder="Venkata" required>
+</div>
+
+<div class="form-group">
+<label>Last Name</label>
+<input type="text" name="lastname" placeholder="Goud"/>
+</div>
+
+</div>
+
+<div class="form-group">
+<label>Mobile Number</label>
+<input type="tel" name="mobile" placeholder="9876543210" maxlength="10" required>
+</div>
+
+<div class="form-group">
+<label>Business / Farm Name (optional)</label>
+<input type="text" name="business_name" placeholder="e.g. Swamy Agri Services">
+</div>
+
+<div class="form-row">
+
+<div class="form-group">
+<label>District</label>
+<input type="text" name="district" placeholder="e.g. Nalgonda"/>
+</div>
+
+<div class="form-group">
+<label>State</label>
+<select name="state">
+<option value="" disabled selected>Select state</option>
+<option>Telangana</option>
+<option>Andhra Pradesh</option>
+<option>Karnataka</option>
+<option>Maharashtra</option>
+<option>Tamil Nadu</option>
+<option>Other</option>
+</select>
+</div>
+
+</div>
+
+<div class="form-group">
+<label>Type of Equipment You Own</label>
+<select name="equipment_type">
+<option value="" disabled selected>Select primary equipment</option>
+<option>Tractor</option>
+<option>Harvester / Combine</option>
+<option>Tiller / Rotavator</option>
+<option>Transplanter</option>
+<option>Sprayer</option>
+<option>Multiple / Other</option>
+</select>
+</div>
+
+<div class="form-group">
+<label>Password</label>
+
+<div class="pass-wrap">
+<input type="password" name="password" id="op" placeholder="Create a strong password" required>
+
+<button type="button" class="pass-toggle" onclick="togglePwd('op',this)">
+👁
+</button>
+</div>
+
+</div>
+
+<button class="btn-submit btn-owner" type="submit">
+Register as Owner →
+</button>
+
+</form>
+
+</div>
+
+<script>
+  function switchRole(role) {
+    const card = document.getElementById('mainCard');
+    document.querySelectorAll('.form-section').forEach(f => f.classList.remove('active'));
+    document.querySelectorAll('.role-tab').forEach(t => t.classList.remove('active-farmer','active-owner'));
+
+    document.getElementById('form-' + role).classList.add('active');
+    document.getElementById('tab-' + role).classList.add(role === 'farmer' ? 'active-farmer' : 'active-owner');
+
+    if (role === 'owner') {
+      card.classList.add('owner-mode');
+    } else {
+      card.classList.remove('owner-mode');
+    }
+  }
+
+  function togglePwd(id, btn) {
+    const inp = document.getElementById(id);
+    if (inp.type === 'password') { inp.type = 'text'; btn.textContent = '🙈'; }
+    else { inp.type = 'password'; btn.textContent = '👁'; }
+  }
+
+  function handleRegister(role) {
+    alert('Registration as ' + (role === 'farmer' ? 'Farmer' : 'Equipment Owner') + ' successful! (Connect to your backend here)');
+  }
+
+  // Read URL param on load
+  window.addEventListener('DOMContentLoaded', () => {
+    const params = new URLSearchParams(window.location.search);
+    const role = params.get('role') === 'owner' ? 'owner' : 'farmer';
+    switchRole(role);
+  });
+</script>
+</body>
+</html>
